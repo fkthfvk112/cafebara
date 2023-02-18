@@ -10,8 +10,9 @@ const path = require('path');
 const Cafe = require('./models/cafe');
 const mongoose = require('mongoose');
 const { string } = require('joi');
+const cors = require('cors');
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 
 
 mongoose.set('strictQuery', false);
@@ -32,6 +33,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({extended:true}));
 app.use(methodOverride('_method'))
 app.use(express.static(__dirname + '/public'))
+app.use(cors())
 
 app.get('/', (req, res)=>{
     res.render('home')
@@ -83,6 +85,15 @@ app.get('/searched_cafe', async(req, res)=>{
       
     res.redirect('/cafe');
   })
+
+// app.get('/react', async(req, res)=>{
+//   res.sendFile('/react-page.html');
+// })
+
+app.get('/react', async(req, res)=>{
+  const cafes = await Cafe.find({})
+  res.json(cafes);
+})
 
 app.delete('/cafe', async(req, res)=>{
     console.log("im here")
