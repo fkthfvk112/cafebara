@@ -10,7 +10,7 @@
 </head>
 <body>
 
-    <div class="container ">
+    <div class="container">
         <div class="row justify-content-md-center text-center">
             <h1 class="my-3"> 카페 생성 페이지</h1>
             <div class="card" style="width: 25rem;">
@@ -28,6 +28,12 @@
                     <input id="cafeLocation" type="text" name="cafe[location]">
                 </li>
                 <li class="list-group-item">
+                    <div class=" flex-column mb-3">
+                        <h5>설명</h5>
+                        <textarea placeholder="카페 특징, 장점, 단점 등&#10;(최대 300자)" name="cafe[description]" id="" cols="40" rows="7" maxlength="300"></textarea>
+                    </div>
+                </li>   
+                <li class="list-group-item">
                     <h5>대표 메뉴</h5>
                     <input id ='repre0' type="text" name="cafe[repreMenu]" style="margin-bottom: 3px;">
                     <input id ='repre1' type="text" name="cafe[repreMenu]" style="margin-bottom: 3px;">
@@ -40,11 +46,11 @@
                     <div id ="menus" class=" flex-column mb-3">
                         <h5>메뉴명 / 가격</h5>
                         <div class="row">
-                            <input class='col-8 menuName0' id="menuName" type="text" name="menu[name]" style="margin-bottom: 3px;" readonly >
+                            <input class='col-8 menuName0' id="menuName" type="text" name="menu[name]" style="margin-bottom: 3px; background-color: #edede9;" readonly >
                             <input class='col-4' id='price' placeholder = '₩' type="text" name="menu[price]" style="margin-bottom: 3px;">
-                            <input class='col-8 menuName1' id="menuName" type="text" name="menu[name]" style="margin-bottom: 3px;" readonly >
+                            <input class='col-8 menuName1' id="menuName" type="text" name="menu[name]" style="margin-bottom: 3px;background-color: #edede9;" readonly >
                             <input class='col-4' id='price' placeholder = '₩' type="text" name="menu[price]" style="margin-bottom: 3px;">
-                            <input class='col-8 menuName2' id="menuName" type="text" name="menu[name]" style="margin-bottom: 3px;" readonly >
+                            <input class='col-8 menuName2' id="menuName" type="text" name="menu[name]" style="margin-bottom: 3px;background-color: #edede9;" readonly >
                             <input class='col-4' id='price' placeholder = '₩' type="text" name="menu[price]" style="margin-bottom: 3px;">
                         </div>
                     </div>
@@ -53,6 +59,23 @@
                         <button id="deleteMenuBtn"class ="btn btn-success" style="width: 3em; text-align: center;">-</button>
                      </div>  
                 </li>
+                    <li class="list-group-item">
+                        <div id ="menus" class=" flex-column mb-3">
+                            <h5>분위기</h5>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="cafe[purpose]" id="inlineRadio1" value="study">
+                                <label class="form-check-label" for="inlineRadio1">공부하기 좋음</label>
+                              </div>
+                              <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="cafe[purpose]" id="inlineRadio2" value="talk">
+                                <label class="form-check-label" for="inlineRadio2">수다떨기 좋음</label>
+                              </div>
+                              <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="cafe[purpose]" id="inlineRadio3" value="nofeatures">
+                                <label class="form-check-label" for="inlineRadio3">이외</label>
+                              </div>
+                        </div>
+                    </li>
                 </ul>
                 <div class="card-body">
                     <button class="btn btn-primary btn-sm mx-3">확인</button>
@@ -100,6 +123,7 @@
 
         const priceInput = document.createElement('input');
         priceInput.setAttribute('id', 'price')
+        priceInput.setAttribute('placeholder', '₩')
         priceInput.setAttribute('name', 'menu[price]')
         priceInput.setAttribute('style', 'margin-bottom:3px')
         priceInput.setAttribute('class', 'col-4')

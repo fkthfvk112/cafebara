@@ -18,7 +18,7 @@
 
     <div class="container ">
         <% for(let cafe of cafes) { %>
-          <a class='card_link' href="/">
+          <a class='card_link' href="/cafe/<%= cafe._id %>">
             <div class="card mb-3">
                 <div class="row g-0">
                   <div class="col-md-4">
@@ -31,7 +31,7 @@
                       <% let cnt = 0 %>
                       <% for(let menu of cafe.repreMenu) {%>
                         <% cnt++ %>
-                        <p class="card-text">대표메뉴 <%= cnt %> : <%= menu %></p>
+                        <p class="card-text">대표메뉴 <%= cnt %> : <%= menu.name %></p>
                       <% }  %>
                     </div>
                   </div>
