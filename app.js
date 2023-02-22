@@ -13,6 +13,9 @@ const User = require('./models/user');
 const mongoose = require('mongoose');
 const { string } = require('joi');
 const cors = require('cors');
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+const session = require('express-session');
 
 const port = process.env.PORT || 8080;
 
@@ -32,7 +35,6 @@ app.engine('ejs', ejsMate);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-app.use(express.urlencoded({extended:true}));
 app.use(methodOverride('_method'))
 app.use(express.static(__dirname + '/public'))
 app.use(cors())
@@ -40,6 +42,25 @@ app.use(cors())
 /* body-parser */
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
+
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());//사용자 정보 세션에 저장
+passport.deserializeUser(User.deserializeUser());//세선의 값을 HTTP Ruest리턴(req.user)
+
+app.use(session({
+  secret: 'secret',
+  resave: false,
+  saveUninitialized: true
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+
+app.use((req, res, next)=>{
+  res.locals.currentUser = req.user;
+  console.log('하하잉', req.user);
+  next();
+})
 
 app.get('/', (req, res)=>{
     res.render('home')
@@ -69,6 +90,45 @@ app.get('/cafe/api/:id', async(req, res)=>{
   });
   console.log('api의 카페', cafe);
   res.json(cafe)
+})
+
+app.get('/user/signup', async(req,res)=>{
+  res.render('signUp');
+})
+
+app.get('/user/signin', async(req,res)=>{
+  res.render('signIn');
+})
+
+
+app.post('/user/signup', async(req, res) => {
+    try{
+      inputedUser = req.body.user;
+      const user = new User({
+        username: inputedUser.username,
+        email: inputedUser.email,
+        nickName: inputedUser.nickName
+      });
+      const registerUser = await User.register(user, inputedUser.password);
+      req.login(registerUser, err=>{
+        if(err) return next(err);
+        res.redirect('/cafe');
+      });
+    }catch(e){
+      console.log(e);
+  }
+});
+
+app.post('/user/signin', passport.authenticate('local', {falureFlash: true, failureRedirect: '/login'}), async(req, res)=>{
+  res.redirect('/cafe');
+})
+
+app.get('/user/logout', async(req, res, next)=>{
+  req.logout((err)=>{
+    console.log(err);
+    return next(err);
+  })
+  res.redirect('/cafe');
 })
 
 app.post('/cafe/user/review/create/:id', async(req, res) => {

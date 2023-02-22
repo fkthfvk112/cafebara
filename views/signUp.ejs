@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>회원가입</title>
+</head>
+<body>
+    <% layout('layouts/boilerplate') %>
+
+    <div class="container mt-3">
+        <div class="row justify-content-md-center text-center">
+            <div class="card" style="width: 25rem;">
+                <form id="signUpForm" action="/user/signup" method="POST">
+                <div class="card-body">
+
+                <h5 class="card-title">회원가입</h5>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item row">
+                        <label for="nickName">아이디</label>
+                        <input id="nickName" type="text" name="user[username]">
+                    </li>
+                    <li class="list-group-item row">
+                        <label for="nickName">닉네임</label>
+                        <input id="nickName" type="text" name="user[nickName]">
+                    </li>
+                    <li class="list-group-item row">
+                        <label for="email">이메일</label>
+                        <input id="email" type="text" name="user[email]">
+                    </li>
+                    <li class="list-group-item row">
+                        <label for="password">비밀번호</label>
+                        <input id="password" type="password" name="user[password]">
+                    </li>
+                    <li class="list-group-item row">
+                        <label for="passwordRecomfirm" >비밀번호 재확인</label>
+                        <input id="passwordRecomfirm" type="password" value="">
+                    </li>
+                </ul>
+                <div class="card-body">
+                    <button class="btn btn-primary btn-sm" id="okBtn" onClick="checkPW()" type="button">가입하기</button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
+<script>
+    function checkPW(){
+        const signUpForm = document.querySelector('#signUpForm');
+        const reconfirmPassword = document.querySelector('#passwordRecomfirm');
+        const password = document.querySelector('#password');
+        const okBtn = document.querySelector('#okBtn');
+
+        const isValidPassword = (reconfirmPassword.value === password.value);
+        if(isValidPassword){
+            signUpForm.submit();
+        }
+        else{
+            alert('비밀번호가 일치하지 않습니다.');
+        }
+        
+    }
+
+    
+</script>
