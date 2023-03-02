@@ -35,10 +35,12 @@ app.engine('ejs', ejsMate);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-app.use(methodOverride('_method'))
-app.use(express.static(__dirname + '/public'))
-app.use(cors())
-
+app.use(methodOverride('_method'));
+app.use(express.static(__dirname + '/public'));
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true
+}));
 /* body-parser */
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
@@ -50,7 +52,7 @@ passport.deserializeUser(User.deserializeUser());//세선의 값을 HTTP Ruest�
 app.use(session({
   secret: 'secret',
   resave: false,
-  saveUninitialized: true
+  saveUninitialized: false,
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -58,14 +60,18 @@ app.use(passport.session());
 
 app.use((req, res, next)=>{
   res.locals.currentUser = req.user;
-  console.log('하하잉', req.user);
   next();
 })
+
+
 
 app.get('/', (req, res)=>{
     res.render('home')
 });
 
+app.get('/map', (req, res)=>{
+  res.render('map');
+})
 app.get('/createCafe', (req, res)=>{
     res.render('createCafe');
 })
@@ -80,16 +86,45 @@ app.get('/cafe/:id', async(req, res)=>{
   res.sendFile(path.join(__dirname, '/public/client-react/build/index.html'));
 })
 
+app.get('/aaa', async(req, res)=>{ //for check something
+  res.send(req.user);
+})
+
+app.get('/user/api/islogIn', async(req, res)=>{
+  if(req.isAuthenticated()){
+    res.json({
+      isLoggedIn:true,
+      user: req.user
+    });
+  }
+  else{
+    res.json({
+      isLoggedIn:false
+    });
+  };
+})
+
 app.get('/cafe/api/:id', async(req, res)=>{
-  const cafe = await Cafe.findById(req.params.id).populate({
+  const cafe = await Cafe.findById(req.params.id)
+  .populate('menu')
+  .populate('repreMenu')
+  .populate({
     path: 'comment',
     populate: {
-      path: 'user replies.user',
-      model: 'User'
+      path: 'user',
+      model: 'User',
+      select: '-password' // 유저 데이터 중 password 필드는 제외
     }
   });
-  console.log('api의 카페', cafe);
+
   res.json(cafe)
+})
+
+app.get('/cafe/api/totalRating/:id', async(req, res)=>{
+  const cafe = await Cafe.findById(req.params.id);
+  const ratings = cafe?cafe.ratingAVG:0;
+
+  res.json(ratings);
 })
 
 app.get('/user/signup', async(req,res)=>{
@@ -119,8 +154,14 @@ app.post('/user/signup', async(req, res) => {
   }
 });
 
-app.post('/user/signin', passport.authenticate('local', {falureFlash: true, failureRedirect: '/login'}), async(req, res)=>{
-  res.redirect('/cafe');
+app.post('/user/signin', passport.authenticate('local', {falureFlash: true, failureRedirect: '/user/login'}), async(req, res)=>{
+  if(req.user){
+    req.session.user = req.user;
+    res.redirect('/cafe');
+  }
+  else{
+    res.redirect('/user/login');
+  }
 })
 
 app.get('/user/logout', async(req, res, next)=>{
@@ -134,24 +175,45 @@ app.get('/user/logout', async(req, res, next)=>{
 app.post('/cafe/user/review/create/:id', async(req, res) => {
   const id = req.params.id;
   const comment = req.body.comment;
-
+  const userID = req.body.userID;
   const cafe = await Cafe.findById(id);
-  console.log('디비', cafe);
-
-  const tempComment = { //have to edit //add user id!!
-    content:comment
+  const tasteRate = req.body.tasteRate;
+  const atmosRate = req.body.atmosRate;
+  const priceRate = req.body.priceRate;
+  let atmos;
+  if(req.body.study){
+    atmos = 'study';
   }
+  else if(req.body.talk){
+    atmos = 'talk';
+  }
+  else{
+    atmos = 'nofeatures'
+  }
+  const tempComment = { //have to edit //add user id!!
+    user:userID,
+    content:comment,
+    purpose:atmos,
+    rating:{
+      taste:tasteRate,
+      atmosphere:atmosRate,
+      price:priceRate
+    }
+  }
+
   cafe.comment.push(tempComment);
   await cafe.save()
-
   res.send('Success!');
 });
 
-// app.get('/react', async(req, res)=>{
-//   const cafes = await Cafe.find({})
-//   res.json(cafes);
-// })
-
+app.post('/cafe/user/review/delete/:id', async(req, res)=>{
+  const comment_id = req.body.commentID;
+  const cafe = await Cafe.updateOne(
+    {_id:req.params.id},
+    {$pull:{comment:{_id:comment_id}}}
+  )
+  res.send('Delete ok');
+})
 app.get('/searched_cafe', async(req, res)=>{
   const searchTerm = req.query.searchingData;
   const results = await Cafe.find({
@@ -186,6 +248,8 @@ app.post('/cafe', async (req, res) => {
     description: cafeData.description,
     purpose: cafeData.purpose,
     location: cafeData.location,
+    latitude: cafeData.latitude,
+    longitude: cafeData.longitude,
     repreMenu: repreMenu
   });
 
@@ -200,7 +264,6 @@ app.post('/cafe', async (req, res) => {
 
 
 app.delete('/cafe', async(req, res)=>{
-    console.log("im here")
     await Cafe.deleteMany({});
     res.redirect('/cafe');
 })

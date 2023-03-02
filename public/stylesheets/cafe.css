@@ -7,3 +7,7 @@
   .card_link:hover .card{
     background-color: aliceblue;
   }
+
+  .hover_changeBg{
+    background-color: aliceblue;
+  }
