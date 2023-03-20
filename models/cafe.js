@@ -2,6 +2,12 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const cafeSchema = new Schema({
+  images:[
+    {
+      url:String,
+      filename:String
+    }
+  ],
   name: {
     type:String,
     required:true,
@@ -38,6 +44,9 @@ const cafeSchema = new Schema({
     required:true
   },
   comment: [{
+    image:{
+      type:String,
+    },
     purpose:{
       type:String,
       enum:['study', 'talk', 'nofeatures']

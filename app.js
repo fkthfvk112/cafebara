@@ -1,3 +1,6 @@
+if(process.env.NODE_ENV !== "production"){
+  require('dotenv').config();
+}
 const express = require('express');
 var methodOverride = require('method-override')
 const ejsMate = require('ejs-mate');//ejs-mate는 ejs의 재사용을 도와줌(boilerplate에 사용)https://www.npmjs.com/package/ejs-mate
@@ -19,6 +22,9 @@ const session = require('express-session');
 
 const port = process.env.PORT || 8080;
 
+const {storage} = require('./cloudinary');
+const multer = require('multer');
+const upload = multer({ storage:storage});
 
 mongoose.set('strictQuery', false);
 mongoose.connect("mongodb://127.0.0.1:27017/Cafe")
@@ -47,7 +53,7 @@ app.use(express.urlencoded({extended:true}));
 
 passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());//사용자 정보 세션에 저장
-passport.deserializeUser(User.deserializeUser());//세선의 값을 HTTP Ruest리턴(req.user)
+passport.deserializeUser(User.deserializeUser());//세션의 값을 HTTP Ruest리턴(req.user)
 
 app.use(session({
   secret: 'secret',
@@ -172,10 +178,15 @@ app.get('/user/logout', async(req, res, next)=>{
   res.redirect('/cafe');
 })
 
-app.post('/cafe/user/review/create/:id', async(req, res) => {
+app.post('/cafe/user/review/create/:id', upload.single('photos'), async(req, res) => {
+  console.log("실행됌");
+  console.log('파일', req.file);
+  console.log("바디", req.body);
+
   const id = req.params.id;
   const comment = req.body.comment;
   const userID = req.body.userID;
+
   const cafe = await Cafe.findById(id);
   const tasteRate = req.body.tasteRate;
   const atmosRate = req.body.atmosRate;
@@ -191,6 +202,7 @@ app.post('/cafe/user/review/create/:id', async(req, res) => {
     atmos = 'nofeatures'
   }
   const tempComment = { //have to edit //add user id!!
+    image:req.file.path,
     user:userID,
     content:comment,
     purpose:atmos,
@@ -200,8 +212,8 @@ app.post('/cafe/user/review/create/:id', async(req, res) => {
       price:priceRate
     }
   }
-
   cafe.comment.push(tempComment);
+  console.log("마지막 카페ㅔㅔ", cafe);
   await cafe.save()
   res.send('Success!');
 });
@@ -228,10 +240,20 @@ app.get('/searched_cafe', async(req, res)=>{
   res.render('cafe', {cafes:results})
 })
 
-app.post('/cafe', async (req, res) => {
+
+app.post('/test', upload.array('photos'), (req, res)=>{
+  console.log('Good');
+  console.log(req.files[0].path);
+
+  res.send(req.files);
+})
+
+app.post('/cafe', upload.array('photos'), async (req, res) => {
   const cafeData = req.body.cafe;
   // menu 배열 생성
-  
+  console.log('카페데이터', cafeData);
+  console.log(req.body, req.files);
+
   const menu = cafeData.menu && cafeData.menu.map((menuItem) => ({
     name: menuItem.name,
     price: menuItem.price,
@@ -242,7 +264,10 @@ app.post('/cafe', async (req, res) => {
     name:repreItem
   }))
 
+  const images = req.files.map(f =>({url:f.path, filename:f.filename}));
+
   const cafe = new Cafe({
+    images:images,
     name: cafeData.name,
     menu: menu,
     description: cafeData.description,
@@ -254,6 +279,7 @@ app.post('/cafe', async (req, res) => {
   });
 
   await cafe.save();
+  console.log('카페', cafe);
   res.redirect('/cafe');
 });
 

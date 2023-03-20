@@ -17,7 +17,7 @@
         <div class="row justify-content-md-center text-center">
             <h1 class="my-3"> 카페 생성 페이지</h1>
             <div class="card" style="width: 25rem;">
-                <form action="/cafe" method="POST">
+                <form action="/cafe" method="POST" enctype="multipart/form-data">
                 <div class="card-body">
 
                 <h5 class="card-title">카페 항목 생성</h5>
@@ -73,6 +73,8 @@
                     <li class="list-group-item">
                         <div id ="menus" class=" flex-column mb-3">
                         </div>
+                        <h5>사진</h5>
+                        <input type="file" name="photos" multiple>
                     </li>
                 </ul>
                 <div class="card-body">

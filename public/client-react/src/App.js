@@ -5,45 +5,13 @@ import axios from 'axios';
 import { BrowserRouter, Routes, Route,} from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
-import Carousel from 'react-bootstrap/Carousel';
 import {StarRating} from './starRating';
 import { KakaoMap } from './kakaoMap';
-
+import {FirstPageCarousel} from './FirstPageCarousel'
 import React, { useState, useEffect } from 'react';
 const grayColor = '#dad7cd';
 axios.defaults.withCredentials = true;
 
-function FirstPageCarousel() {
-  return (
-    <Carousel slide={false}>
-      <Carousel.Item>
-        <img
-          className="d-block w-100"
-          src="https://cdn.pixabay.com/photo/2023/01/12/05/32/duck-7713310_640.jpg"
-          alt="First slide"
-          style={{width: '50%'}}
-        />
-
-      </Carousel.Item>
-      <Carousel.Item>
-        <img
-          className="d-block w-100"
-          src="https://cdn.pixabay.com/photo/2023/01/12/05/32/duck-7713310_640.jpg"
-          alt="Second slide"
-          style={{width: '50%'}}
-        />
-      </Carousel.Item>
-      <Carousel.Item>
-        <img
-          className="d-block w-100"
-          src="https://cdn.pixabay.com/photo/2023/01/12/05/32/duck-7713310_640.jpg"
-          alt="Third slide"
-          style={{width: '50%'}}
-        />
-      </Carousel.Item>
-    </Carousel>
-  );
-}
 
 function PageOne(probs){
   const [ratings, setRatings] = useState();
@@ -112,9 +80,11 @@ function PageOne(probs){
     }
     return resultText;
   }
+
+  const images = probs.cafeData?probs.cafeData.images:[{url:''}];
   return(
     <div>
-      <FirstPageCarousel className="row pt-3 pb-3" style={{width: '50%'}}/>{/*1번항목*/}
+      <FirstPageCarousel images={images} className="row pt-3 pb-3" style={{width: '50%'}}/>{/*1번항목*/}
       <div className="row mt-3 pt-3 pb-3" style={{borderTop:`2px solid ${grayColor}`}}>{/*2번항목*/}
         <div className="col-3 ms-4 d-flex flex-column align-items-center justify-content-center">
           <div>
@@ -217,7 +187,6 @@ function PageTwoSectionTwo(probs){
     };
     fetchData();
   }, [probs.parentData, deleteToggle]); //data수정. 컴포넌트 재 랜더링 되도록
-  console.log('토글', deleteToggle);
 
   const connectedUserId = probs.user.user ? probs.user.user._id : null;
   
@@ -240,8 +209,10 @@ function PageTwoSectionTwo(probs){
   }
   const reviews = [];
 
+  console.log("데이터 데이터", data);
   if(data != null){
     for(let comment of data.comment){
+      console.log("코맨트 코맨트", comment);
       const rating = comment.rating;
       const ratingAvg = ((rating.price + rating.taste + rating.atmosphere)/3).toFixed(2);
     reviews.push(
@@ -254,9 +225,13 @@ function PageTwoSectionTwo(probs){
           <div className="col-3">
           <StarRating count={5} size={15} value={ratingAvg}></StarRating>
           <div className="ml-3 mb-2" style = {{textAlign:'left', marginLeft:'0.5rem'}}>{comment.user.nickName}</div>
-          <img
-            className="d-block w-100"
-            src="https://cdn.pixabay.com/photo/2023/01/12/05/32/duck-7713310_640.jpg"/>
+          <div style={{paddingRight:'10px', width:"100px", height:"100px"}}>
+            <img
+              className="d-block w-100"
+              src={comment.image}
+              style ={{objectFit :'contain', width :'100%', height :'100%'}}
+              />
+          </div>
           </div>
           <div className="col-9 ml-3" style={{borderLeft:`2px solid ${grayColor}`}}>
           <div style={{textAlign:'left'}}>
@@ -286,7 +261,7 @@ function PageTwoSectionThree(probs) {
   const [study, setStudy] = useState(false);
   const [talk, setTalk] = useState(false);
   const [noFeature, setNoFeature] = useState(false);
-
+  const [imgFile, setImgFile] = useState({});
 
   console.log(tasteRate, atmosRate, priceRate);
 
@@ -306,7 +281,8 @@ function PageTwoSectionThree(probs) {
   async function submitForm(data) {
     const url = window.location.pathname;
     const id = url.substring(url.lastIndexOf('/') + 1);
-    console.log('이이잉', data);
+
+    console.log('데이터', data);
     await axios.post(`http://localhost:8080/cafe/user/review/create/${id}`, data)
       .then((res) => {
         setFormState('');
@@ -320,16 +296,20 @@ function PageTwoSectionThree(probs) {
   const handleSubmit = (event) => {
     event.preventDefault();
     probs.setCommentUpdated({...{state:true}});
-    submitForm({ 
-      comment: formState,
-      userID: userID,
-      tasteRate:tasteRate,
-      atmosRate:atmosRate,
-      priceRate:priceRate,
-      study:study,
-      talk:talk,
-      noFeature:noFeature
-    });
+
+    const formData = new FormData();
+
+    formData.append('comment', formState);
+    formData.append('userID', userID);
+    formData.append('tasteRate', tasteRate);
+    formData.append('atmosRate', atmosRate);
+    formData.append('priceRate', priceRate);
+    formData.append('study', study);
+    formData.append('talk', talk);
+    formData.append('noFeature', noFeature);
+    formData.append('photos', imgFile);
+
+    submitForm(formData);
     probs.setParentData({...{comment: formState} });
     handleCloseModal();
   };
@@ -364,10 +344,12 @@ function PageTwoSectionThree(probs) {
     setTalk(false);
   }
   
-  const handleAttachPhoto = (event) => {
-    event.preventDefault();
-    // 사진 첨부 기능 구현
+  const handleFileUpload = (event) =>{
+    const uploadedFile = event.target.files[0];
+    setImgFile(uploadedFile);
+    console.log("업로드딘 파일", uploadedFile);
   }
+
 
   return (
     <div className="mb-3">
@@ -380,7 +362,7 @@ function PageTwoSectionThree(probs) {
                 <h5 className="modal-title">리뷰 작성</h5>
                 <button type="button" className="close" onClick={handleCloseModal}>&times;</button>
               </div>
-              <form onSubmit={handleSubmit} className="d-flex flex-column">
+              <form onSubmit={handleSubmit} className="d-flex flex-column" enctype="multipart/form-data">
                       <div className="modal-body d-flex flex-column mt-3">
                           <div className='offset-1 col-8 mb-3' style={{textAlign:'right'}}>
                             <div>
@@ -418,7 +400,10 @@ function PageTwoSectionThree(probs) {
                           </div>
                         </div>
                           <textarea style={{ minHeight: '5rem', minWidth: '20rem' }} name='cafe[comment]' value={formState} onChange={handleInputChange} />
-                          <button onClick={handleAttachPhoto}>사진 첨부</button>
+                          <div class="input-group mb-3 mt-3">
+                            <input type="file" class="form-control" id="inputGroupFile02"  onChange={handleFileUpload}/>
+                            <label class="input-group-text" for="inputGroupFile02">사진</label>
+                          </div>
                       </div>
                       <div className="modal-footer justify-content-around">
                         <button type="submit" className="btn btn-success">완료</button>
@@ -501,7 +486,8 @@ function SetPage(probs) {
     };
     fetchData();
   }, [id]);
-  
+  console.log('데이터', cafeData);
+
   let content = null;
   switch(pageNumber){
     case 0:
