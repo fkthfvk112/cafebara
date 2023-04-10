@@ -5,7 +5,7 @@ export function FirstPageCarousel(probs) {
   
     for(let img of probs.images){
       Carousel_list.push(
-        <Carousel.Item style={{height: '25rem', width:'25rem'}}>
+        <Carousel.Item className="d-flex justify-content-center">
           <img
             className="d-block w-100"
             src={img.url}
@@ -17,7 +17,7 @@ export function FirstPageCarousel(probs) {
   
   
     return (
-      <Carousel slide={false}>
+      <Carousel className="d-flex justify-content-center" style={{width:'30rem'}} slide={false}>
         {Carousel_list}
       </Carousel>
     );

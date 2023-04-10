@@ -16,7 +16,7 @@
     <div class="container">
         <div class="row justify-content-md-center text-center">
             <h1 class="my-3"> 카페 생성 페이지</h1>
-            <div class="card" style="width: 25rem;">
+            <div class="card" style="width: 30rem;">
                 <form action="/cafe" method="POST" enctype="multipart/form-data">
                 <div class="card-body">
 
@@ -44,11 +44,11 @@
                         <textarea placeholder="카페 특징, 장점, 단점 등&#10;(최대 300자)" name="cafe[description]" id="" cols="40" rows="7" maxlength="300"></textarea>
                     </div>
                 </li>   
-                <li class="list-group-item">
+                <li class="list-group-item d-flex flex-column">
                     <h5>대표 메뉴</h5>
-                    <input id ='repre0' type="text" name="cafe[repreMenu]" style="margin-bottom: 3px;">
-                    <input id ='repre1' type="text" name="cafe[repreMenu]" style="margin-bottom: 3px;">
-                    <input id ='repre2' type="text" name="cafe[repreMenu]"style="margin-bottom: 3px;">
+                    <input id ='repre0' type="text" style="margin-bottom: 3px;">
+                    <input id ='repre1' type="text" style="margin-bottom: 3px;">
+                    <input id ='repre2' type="text" style="margin-bottom: 3px;">
                     <div>
                         <button id="repMenuBtn" class="btn btn-primary btn-sm mx-3">확인</button>
                     </div>
@@ -57,12 +57,24 @@
                     <div id ="menus" class=" flex-column mb-3">
                         <h5>메뉴명 / 가격</h5>
                         <div class="row">
-                            <input class='col-8 menuName0' id="menuName" type="text" name="menu[name]" style="margin-bottom: 3px; background-color: #edede9;" readonly >
-                            <input class='col-4' id='price' placeholder = '₩' type="text" name="menu[price]" style="margin-bottom: 3px;">
-                            <input class='col-8 menuName1' id="menuName" type="text" name="menu[name]" style="margin-bottom: 3px;background-color: #edede9;" readonly >
-                            <input class='col-4' id='price' placeholder = '₩' type="text" name="menu[price]" style="margin-bottom: 3px;">
-                            <input class='col-8 menuName2' id="menuName" type="text" name="menu[name]" style="margin-bottom: 3px;background-color: #edede9;" readonly >
-                            <input class='col-4' id='price' placeholder = '₩' type="text" name="menu[price]" style="margin-bottom: 3px;">
+                            <div class="row mb-3">
+                                <input class='col-8 menuName0' id="menuName" type="text" name="repreMenu[name]" style="margin-bottom: 3px; background-color: #edede9;" readonly >
+                                <input class='col-4' id='price' placeholder = '₩' type="text" name="repreMenu[price]" style="margin-bottom: 3px;">
+                                <textarea name="repreMenu[description]" placeholder="메뉴 설명을 입력해주세요."></textarea>
+                                <input name="repreMenuPhoto" type="file">
+                            </div>
+                            <div class="row mb-3">
+                                <input class='col-8 menuName1' id="menuName" type="text" name="repreMenu[name]" style="margin-bottom: 3px;background-color: #edede9;" readonly >
+                                <input class='col-4' id='price' placeholder = '₩' type="text" name="repreMenu[price]" style="margin-bottom: 3px;">
+                                <textarea name="repreMenu[description]" placeholder="메뉴 설명을 입력해주세요."></textarea>
+                                <input name="repreMenuPhoto" type="file">
+                            </div>
+                            <div class="row mb-3">
+                                <input class='col-8 menuName2' id="menuName" type="text" name="repreMenu[name]" style="margin-bottom: 3px;background-color: #edede9;" readonly >
+                                <input class='col-4' id='price' placeholder = '₩' type="text" name="repreMenu[price]" style="margin-bottom: 3px;">
+                                <textarea name="repreMenu[description]" placeholder="메뉴 설명을 입력해주세요."></textarea>
+                                <input name="repreMenuPhoto" type="file">
+                            </div>
                         </div>
                     </div>
                     <div class="card-body" style="padding-top:2px">
@@ -73,7 +85,7 @@
                     <li class="list-group-item">
                         <div id ="menus" class=" flex-column mb-3">
                         </div>
-                        <h5>사진</h5>
+                        <h5>카페 사진</h5>
                         <input type="file" name="photos" multiple>
                     </li>
                 </ul>
@@ -148,7 +160,7 @@
         e.preventDefault();
         const newInput = document.createElement('input');
         const row = document.createElement('div')
-        row.setAttribute('class', 'row')
+        row.setAttribute('class', 'row mb-3')
         newInput.setAttribute('id', 'menuName')
         newInput.setAttribute('name', 'menu[name]')
         newInput.setAttribute('style', 'margin-bottom:3px')
@@ -161,10 +173,21 @@
         priceInput.setAttribute('style', 'margin-bottom:3px')
         priceInput.setAttribute('class', 'col-4')
         
-        row.append(newInput)
-        row.append(priceInput)
+        const textArea = document.createElement('textarea');
+        textArea.setAttribute('name', 'menu[description]');
+        textArea.setAttribute('placeholder', '메뉴 설명을 입력하세요.');
 
-        menus.append(row)
+        const fileInput = document.createElement('input');
+        fileInput.setAttribute('type', 'file');
+        fileInput.setAttribute('name', 'menuPhoto')
+
+        row.append(newInput);
+        row.append(priceInput);
+        row.append(textArea);
+        row.append(fileInput);
+
+        menus.append(row);
+
         inputCnt++;
     })
 

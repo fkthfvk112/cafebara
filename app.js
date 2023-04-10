@@ -9,6 +9,7 @@ const app = express();
 
 const path = require('path');
 
+const {isLoggedIn} = require('./controller/middleware')
 /*DataBase*/
 const Cafe = require('./models/cafe');
 const User = require('./models/user');
@@ -78,7 +79,7 @@ app.get('/', (req, res)=>{
 app.get('/map', (req, res)=>{
   res.render('map');
 })
-app.get('/createCafe', (req, res)=>{
+app.get('/createCafe', isLoggedIn, (req, res)=>{
     res.render('createCafe');
 })
 
@@ -160,10 +161,13 @@ app.post('/user/signup', async(req, res) => {
   }
 });
 
-app.post('/user/signin', passport.authenticate('local', {falureFlash: true, failureRedirect: '/user/login'}), async(req, res)=>{
+app.post('/user/signin', passport.authenticate('local', {falureFlash: true,  keepSessionInfo: true, failureRedirect: '/user/login'}), async(req, res)=>{
   if(req.user){
+    const redirectUrl = req.session.returnTo||'/cafe';
     req.session.user = req.user;
-    res.redirect('/cafe');
+
+    delete req.session.returnTo;
+    res.redirect(redirectUrl);
   }
   else{
     res.redirect('/user/login');
@@ -202,7 +206,7 @@ app.post('/cafe/user/review/create/:id', upload.single('photos'), async(req, res
     atmos = 'nofeatures'
   }
   const tempComment = { //have to edit //add user id!!
-    image:req.file.path,
+    image:req.file&&req.file.path,  //에러 발생
     user:userID,
     content:comment,
     purpose:atmos,
@@ -213,7 +217,6 @@ app.post('/cafe/user/review/create/:id', upload.single('photos'), async(req, res
     }
   }
   cafe.comment.push(tempComment);
-  console.log("마지막 카페ㅔㅔ", cafe);
   await cafe.save()
   res.send('Success!');
 });
@@ -248,26 +251,47 @@ app.post('/test', upload.array('photos'), (req, res)=>{
   res.send(req.files);
 })
 
-app.post('/cafe', upload.array('photos'), async (req, res) => {
+app.post('/cafe', upload.fields([{name:'photos'}, {name:'repreMenuPhoto'},{name:'menuPhoto'}]), async (req, res) => {
   const cafeData = req.body.cafe;
+  const rePreMenuData = req.body.repreMenu;
+  const menuData = req.body.menu;
   // menu 배열 생성
-  console.log('카페데이터', cafeData);
-  console.log(req.body, req.files);
 
-  const menu = cafeData.menu && cafeData.menu.map((menuItem) => ({
-    name: menuItem.name,
-    price: menuItem.price,
-  }));
-  console.log('대표메뉴', cafeData.repreMenu);
-  
-  const repreMenu = cafeData.repreMenu && cafeData.repreMenu.map((repreItem)=>({
-    name:repreItem
-  }))
+  console.log("파일스", req.files);
+  console.log("파일스2", req.files.menuPhoto);
 
-  const images = req.files.map(f =>({url:f.path, filename:f.filename}));
+  let menu;
+  if(Array.isArray(menuData&&menuData.name)){
+    menu = menuData && menuData.name.map((name, idx)=>({
+      name,
+      price:menuData.price[idx],
+      description:menuData.description[idx]&&menuData.description[idx],
+      imgUrl:req.files.menuPhoto[idx]&&req.files.menuPhoto[idx].path,
+      filename:req.files.menuPhoto[idx]&&req.files.menuPhoto[idx].filename
+    }))
+  }
+  else{
+    menu = menuData;
+  }
+
+  let repreMenu;
+  if(Array.isArray(rePreMenuData&&rePreMenuData.name)){
+      repreMenu = rePreMenuData && rePreMenuData.name.map((name, idx)=>({
+      name,
+      price:rePreMenuData.price[idx],
+      description:rePreMenuData.description[idx]&&rePreMenuData.description[idx],
+      imgUrl:req.files.repreMenuPhoto[idx]&&req.files.repreMenuPhoto[idx].path,
+      filename:req.files.repreMenuPhoto[idx]&&req.files.repreMenuPhoto[idx].filename
+    }))
+  }
+  else{
+    repreMenu = rePreMenuData;
+  }
+
+  const cafeImages = req.files.photos.map(f =>({url:f.path, filename:f.filename}));
 
   const cafe = new Cafe({
-    images:images,
+    images:cafeImages,
     name: cafeData.name,
     menu: menu,
     description: cafeData.description,

@@ -36,3 +36,27 @@
     transform: rotate(360deg);
   }
 }
+
+.topButton{
+  width: 20vw;
+  height: 30px;
+  max-width: 250px;
+  min-width: 100px;
+  background-color: #231942;
+  color: azure;
+  border:none;
+  padding: 5px 8% 5px 8%;
+  position: relative;
+  top:-27px;
+  z-index: 1;
+  transition: 0.2s ease;
+  border-radius: 10px 10px 0px 0px;
+  font-size: 62%;
+  font-weight: bold;
+
+}
+
+.topButton:hover{
+  background-color: #5e548e;
+}
+

@@ -13,21 +13,26 @@ const cafeSchema = new Schema({
     required:true,
     unique:true
   },
-  menu: [
-    {
-      name: String,
-      price: Number,
-    }
-  ],
   description:{
     type:String,
     required:true
   },
+  menu: [
+    {
+      name: String,
+      price: Number,
+      imgUrl:String,
+      filename:String,
+      description:String
+    }
+  ],
   repreMenu: [
     {
       name:String,
-      //img:String,
-      //required:true
+      imgUrl:String,
+      filename:String,
+      description:String,
+      price:Number
     }
   ],
   takeOut:Boolean,

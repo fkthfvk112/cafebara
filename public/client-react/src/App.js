@@ -9,7 +9,7 @@ import {StarRating} from './starRating';
 import { KakaoMap } from './kakaoMap';
 import {FirstPageCarousel} from './FirstPageCarousel'
 import React, { useState, useEffect } from 'react';
-const grayColor = '#dad7cd';
+const grayColor = '#edede9';
 axios.defaults.withCredentials = true;
 
 
@@ -83,8 +83,10 @@ function PageOne(probs){
 
   const images = probs.cafeData?probs.cafeData.images:[{url:''}];
   return(
-    <div>
-      <FirstPageCarousel images={images} className="row pt-3 pb-3" style={{width: '50%'}}/>{/*1번항목*/}
+    <div className="row" style={{width:'50vw', maxWidth:'850px', minWidth:'360px'}} >
+      <div className="d-flex justify-content-center">
+        <FirstPageCarousel images={images} className="row pt-3 pb-3" style={{width: '50%'}}/>{/*1번항목*/}
+      </div>
       <div className="row mt-3 pt-3 pb-3" style={{borderTop:`2px solid ${grayColor}`}}>{/*2번항목*/}
         <div className="col-3 ms-4 d-flex flex-column align-items-center justify-content-center">
           <div>
@@ -144,8 +146,8 @@ function PageTwoSectionOne(probs){
   const totalRatingAvg = ratings?(((ratings.taste + ratings.atmosphere + ratings.price)/3).toFixed(2)):0;
 
   return(
-    <div>
-      <Container className="row mt-3 pt-3 pb-3 mb-3 text-center" style={{border:`2px solid ${grayColor}`, minHeight: '5rem', width: '30rem' }}>{/*2번항목*/}
+    <div className="d-flex align-items-center justify-content-center ">
+      <Container className="row mt-3 pt-3 pb-3 mb-3 text-center" style={{border:`2px solid ${grayColor}`, minWidth: '360px', maxWidth:'850px', width: '50vw' }}>{/*2번항목*/}
         <div className="col-3 d-flex flex-column align-items-center justify-content-center">
             <div className='fw-bold fs-4 text-center'>{totalRatingAvg}/5.00</div>
             <StarRating count={5} size={15} value={totalRatingAvg}/>
@@ -215,25 +217,26 @@ function PageTwoSectionTwo(probs){
       console.log("코맨트 코맨트", comment);
       const rating = comment.rating;
       const ratingAvg = ((rating.price + rating.taste + rating.atmosphere)/3).toFixed(2);
-    reviews.push(
-      <Container className="row mt-3 pt-3 pb-3 mb-3" style={{border:`2px solid ${grayColor}`, minHeight: '5rem', width: '30rem' }}>{/*2번항목*/}
+      const img = comment.image && <img
+                  className="d-block w-100"
+                  src={comment.image}
+                  style ={{objectFit :'contain', width :'100%', height :'100%'}}
+                  />
+      reviews.push(
+      <Container className="row mt-3 pt-3 pb-3 mb-3" style={{border:`2px solid ${grayColor}`, minHeight: '5rem', width:'50vw', maxWidth: '850px', minWidth:'360px' }}>{/*2번항목*/}
         <div style = {{textAlign:'right'}}>
         <form onSubmit={handleSubmit(comment._id)}>
           {probs.isLoggedIn&&(comment.user._id===connectedUserId)&&<button type="submit" class="btn btn-outline-secondary btn-sm">삭제</button>}
           </form>
         </div>
-          <div className="col-3">
+          <div className="col-3" style={{minWidth:'110px'}}>
           <StarRating count={5} size={15} value={ratingAvg}></StarRating>
           <div className="ml-3 mb-2" style = {{textAlign:'left', marginLeft:'0.5rem'}}>{comment.user.nickName}</div>
           <div style={{paddingRight:'10px', width:"100px", height:"100px"}}>
-            <img
-              className="d-block w-100"
-              src={comment.image}
-              style ={{objectFit :'contain', width :'100%', height :'100%'}}
-              />
+            {img}
           </div>
           </div>
-          <div className="col-9 ml-3" style={{borderLeft:`2px solid ${grayColor}`}}>
+          <div className="offset-lg-1 col-8 ml-3" style={{borderLeft:`2px solid ${grayColor}`}}>
           <div style={{textAlign:'left'}}>
             <div style={{textSize:'1em', color:'white', textAlign:'center', display:'inline-block', backgroundColor:'#219ebc', padding:'0 1rem 0 1rem', borderRadius:'1rem', marginTop:'0.5rem'}}>
               {comment.purpose}
@@ -246,7 +249,7 @@ function PageTwoSectionTwo(probs){
   }}
 
   return(
-    <div>
+    <div className="d-flex justify-content-center row">
       {reviews}
     </div>
   )
@@ -432,39 +435,94 @@ function PageTwo(probs){
   )
 }
 
-function PageThree(){
-  const [data, setData] = useState(null);
-  const { id } = useParams();
+function PageThree(props){
+  console.log("페이지 3", props.repreMenus);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`http://localhost:8080/cafe/api/${id}`);
-        setData(response.data);
+  const repreMenuArr = [];
+  for(let repre of props.repreMenus){
+    repreMenuArr.push(
+      <div className='row border-bottom mb-3'>
+        <div className="col-4">
+          <div className="mb-3" style={{fontWeight:'bold', textAlign:'start'}}>{repre.name}</div>
+          <div style={{textAlign:'start', marginLeft:'0.5rem'}}>{repre.price.toLocaleString()}원</div>
+        </div>
+        <div className='col-5'>
+          <div style={{textAlign:'start'}}>
+            {repre.description}
+          </div>
+        </div>
+        <div className='col-3'>
+          <img
+                className="d-block w-100 mb-2"
+                src={repre.imgUrl}
+                style ={{objectFit :'contain', width :'100%', height :'100%'}}
+                />
+        </div>
+      </div>
+    );
+  }
 
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchData();
-  }, [id]);
-  let result = <li>
-                <ol>{data}</ol>
-                <ol>{data}</ol>
-               </li>
+  const menuArr = [];
+  for(let menu of props.menus){
+    let image = menu.imgUrl&&<img
+        className="d-block w-100 mb-2"
+        src={menu.imgUrl}
+        style ={{objectFit :'contain', width :'100%', height :'100%'}}
+      />
+    menuArr.push(
+      <div className='row border-bottom mb-3 p-3'>
+        <div className="col-4">
+          <div className="mb-3" style={{fontWeight:'bold', textAlign:'start'}}>{menu.name}</div>
+          <div style={{textAlign:'start', marginLeft:'0.5rem'}}>{menu.price.toLocaleString()}원</div>
+        </div>
+        <div className='col-5'>
+          <div style={{textAlign:'start'}}>
+            {menu.description}
+          </div>
+        </div>
+        <div className='col-3'>
+        {image}
+        </div>
+      </div>
+    )
+  }
 
-  let menus = data && data.menu.map(menu => (
-    <ol key={menu._id}>{menu.name}</ol>
-  ));
-  
+  function RepreMenu(){
+    if(repreMenuArr){
+      return(
+        <div style={{border:'3px ridge #5e548e', padding:'2rem', margin:'1rem', borderRadius:'15px'}}>
+          <h3 style={{marginBottom:'3rem', color:'#000814'}}>***대표 메뉴***</h3>
+          {repreMenuArr}
+        </div>
+      )
+    }
+    else{
+      return(
+        <div>ss</div>
+      )
+    }
+  }
+
+  function Menu(){
+    if(menuArr){
+      return(
+        <div>
+          <h4 style={{textAlign:'start', paddingLeft:'15px', padding:'15px', marginLeft:'15px',  marginRight:'15px', marginBottom:'15px',border:`1px ${grayColor} solid;`, backgroundColor:'#dfe7fd'}}>
+            메뉴
+          </h4>
+          {menuArr}
+        </div>
+      )
+    }
+    else{
+      <div></div>
+    }
+  }
+
   return(
-    <div>
-      {data && (
-        <li>
-          <ol>{data.name}</ol>
-          {menus}
-        </li>
-      )}
+    <div style={{ maxWidth: '650px', minWidth:'300px' }}>
+      <RepreMenu/>
+      <Menu/>
     </div>
   )
 }
@@ -472,6 +530,8 @@ function PageThree(){
 function SetPage(probs) {
   const [cafeData, setCafeData] = useState(null);
   const [pageNumber, setPage] = useState(0);
+  const [menus, setMenus] = useState(null);
+  const [repreMenus, setRepreMenus] = useState(null);
 
   const url = window.location.pathname;
   const id = url.substring(url.lastIndexOf('/') + 1);
@@ -480,13 +540,15 @@ function SetPage(probs) {
       try {
         const response = await axios.get(`http://localhost:8080/cafe/api/${id}`);
         setCafeData(response.data);
+        setMenus(response.data.menu);
+        setRepreMenus(response.data.repreMenu);
       } catch (error) {
         console.log(error);
       }
     };
     fetchData();
   }, [id]);
-  console.log('데이터', cafeData);
+  console.log('받아온 카페 데이터', cafeData);
 
   let content = null;
   switch(pageNumber){
@@ -497,23 +559,23 @@ function SetPage(probs) {
       content = <PageTwo isLoggedIn={probs.isLoggedIn} user={probs.user}></PageTwo>
       break;
     case 2:
-      content = <PageThree></PageThree>
+      content = <PageThree repreMenus = {repreMenus} menus={menus}></PageThree>
       break;
 }
 
   return (
     <div>
-      <button onClick={() => setPage(0)}>
+      <button className='topButton btn1' onClick={() => setPage(0)}>
         요약
       </button>
-      <button onClick={() => setPage(1)}>
+      <button className='topButton btn2' onClick={() => setPage(1)}>
         후기
       </button>
-      <button onClick={() => setPage(2)}>
-        Click me
+      <button className='topButton btn3' onClick={() => setPage(2)}>
+        메뉴
       </button>
       <BrowserRouter>
-        <Routes>
+        <Routes className="d-flex justify-content-center"> 
           <Route path="/cafe/:id" element={content}></Route>
         </Routes>
         <span>
@@ -539,7 +601,7 @@ function App() {
   console.log('유저 데이터', userData)
   return (
     <div className="App">
-      <Container className="d-flex justify-content-center" style={{border:`1px solid ${grayColor}`, marginTop:'10%'}}>
+      <Container className="d-flex justify-content-center" style={{backgroundColor:'white', border:`1px solid ${grayColor}`, marginTop:'10%', minWidth:'350px'}}>
         <SetPage isLoggedIn={isLoggedIn} user={userData}></SetPage>
       </Container>
     </div>
