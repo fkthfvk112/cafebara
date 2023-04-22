@@ -13,34 +13,34 @@
     <div class="container mt-3">
         <div class="row justify-content-md-center text-center">
             <div class="card" style="width: 25rem;">
-                <form id="signUpForm" action="/user/signup" method="POST">
+                <form class="needs-validation" id="signUpForm" action="/user/signup" method="POST" novalidate>
                 <div class="card-body">
 
                 <h5 class="card-title">회원가입</h5>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item row">
                         <label for="nickName">아이디</label>
-                        <input id="nickName" type="text" name="user[username]">
+                        <input class="form-control" id="nickName" type="text" name="user[username]" required>
                     </li>
                     <li class="list-group-item row">
                         <label for="nickName">닉네임</label>
-                        <input id="nickName" type="text" name="user[nickName]">
+                        <input class="form-control" id="nickName" type="text" name="user[nickName]" required>
                     </li>
                     <li class="list-group-item row">
                         <label for="email">이메일</label>
-                        <input id="email" type="text" name="user[email]">
+                        <input class="form-control" id="email" type="text" name="user[email]" required>
                     </li>
                     <li class="list-group-item row">
                         <label for="password">비밀번호</label>
-                        <input id="password" type="password" name="user[password]">
+                        <input class="form-control"  id="password" type="password" name="user[password]" required>
                     </li>
                     <li class="list-group-item row">
-                        <label for="passwordRecomfirm" >비밀번호 재확인</label>
-                        <input id="passwordRecomfirm" type="password" value="">
+                        <label for="passwordRecomfirm" >비밀번호 확인</label>
+                        <input class="form-control"  id="passwordRecomfirm" type="password" value="" required>
                     </li>
                 </ul>
                 <div class="card-body">
-                    <button class="btn btn-primary btn-sm" id="okBtn" onClick="checkPW()" type="button">가입하기</button>
+                    <button class="btn btn-primary btn-sm" id="okBtn"  type="submit">가입하기</button>
                 </div>
                 </form>
             </div>
@@ -57,14 +57,30 @@
         const okBtn = document.querySelector('#okBtn');
 
         const isValidPassword = (reconfirmPassword.value === password.value);
-        if(isValidPassword){
-            signUpForm.submit();
-        }
-        else{
+        if(!isValidPassword){
+            event.preventDefault()
+            event.stopPropagation()
             alert('비밀번호가 일치하지 않습니다.');
-        }
-        
+        }       
     }
 
-    
+    (() => {
+    'use strict'
+  
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    const forms = document.querySelectorAll('.needs-validation')
+  
+    // Loop over them and prevent submission
+    Array.from(forms).forEach(form => {
+      form.addEventListener('submit', event => {
+        if (!form.checkValidity()) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+        else checkPW();
+  
+        form.classList.add('was-validated')
+      }, false)
+    })
+  })()
 </script>

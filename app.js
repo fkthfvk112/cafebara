@@ -24,8 +24,11 @@ const session = require('express-session');
 const port = process.env.PORT || 8080;
 
 const {storage} = require('./cloudinary');
+const {cloudinary} = require('./cloudinary')
 const multer = require('multer');
 const upload = multer({ storage:storage});
+const flash = require('express-flash');
+const cookieParser = require('cookie-parser');
 
 mongoose.set('strictQuery', false);
 mongoose.connect("mongodb://127.0.0.1:27017/Cafe")
@@ -56,6 +59,7 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());//사용자 정보 세션에 저장
 passport.deserializeUser(User.deserializeUser());//세션의 값을 HTTP Ruest리턴(req.user)
 
+
 app.use(session({
   secret: 'secret',
   resave: false,
@@ -64,14 +68,20 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-
 app.use((req, res, next)=>{
   res.locals.currentUser = req.user;
   next();
 })
 
+app.use(cookieParser('keyboard cat'));
 
+app.use(flash());
 
+app.use((req, res, next)=>{
+  req.locals.success = req.flash('success');
+  req.locals.error = req.flash('error');
+  next();
+})
 app.get('/', (req, res)=>{
     res.render('home')
 });
@@ -113,6 +123,7 @@ app.get('/user/api/islogIn', async(req, res)=>{
 
 app.get('/cafe/api/:id', async(req, res)=>{
   const cafe = await Cafe.findById(req.params.id)
+  .populate('author')
   .populate('menu')
   .populate('repreMenu')
   .populate({
@@ -123,7 +134,6 @@ app.get('/cafe/api/:id', async(req, res)=>{
       select: '-password' // 유저 데이터 중 password 필드는 제외
     }
   });
-
   res.json(cafe)
 })
 
@@ -143,7 +153,7 @@ app.get('/user/signin', async(req,res)=>{
 })
 
 
-app.post('/user/signup', async(req, res) => {
+app.post('/user/signup', isLoggedIn, async(req, res) => {
     try{
       inputedUser = req.body.user;
       const user = new User({
@@ -157,22 +167,37 @@ app.post('/user/signup', async(req, res) => {
         res.redirect('/cafe');
       });
     }catch(e){
-      console.log(e);
+      console.log('에러',e);
   }
 });
 
-app.post('/user/signin', passport.authenticate('local', {falureFlash: true,  keepSessionInfo: true, failureRedirect: '/user/login'}), async(req, res)=>{
-  if(req.user){
-    const redirectUrl = req.session.returnTo||'/cafe';
-    req.session.user = req.user;
+app.use((err, req, res, next) => {
+  flash('error', err);
+  res.redirect('/');
+})
 
-    delete req.session.returnTo;
-    res.redirect(redirectUrl);
+
+app.post('/user/signin', passport.authenticate('local', {falureFlash: true,  keepSessionInfo: true, failureRedirect: '/user/signin'}), async(req, res)=>{
+  try{
+    if(req.user){
+      const redirectUrl = req.session.returnTo||'/cafe';
+      req.session.user = req.user;
+  
+      delete req.session.returnTo;
+      flash('sucess', "환영합니다")
+      res.redirect(redirectUrl);
+    }
+    else{
+      flash('error', "로그인 오류")
+      res.redirect('/user/login');
+    }
   }
-  else{
-    res.redirect('/user/login');
+  catch(err){
+    console.log("에러", err);
+    next(err);
   }
 })
+
 
 app.get('/user/logout', async(req, res, next)=>{
   req.logout((err)=>{
@@ -183,10 +208,6 @@ app.get('/user/logout', async(req, res, next)=>{
 })
 
 app.post('/cafe/user/review/create/:id', upload.single('photos'), async(req, res) => {
-  console.log("실행됌");
-  console.log('파일', req.file);
-  console.log("바디", req.body);
-
   const id = req.params.id;
   const comment = req.body.comment;
   const userID = req.body.userID;
@@ -205,8 +226,12 @@ app.post('/cafe/user/review/create/:id', upload.single('photos'), async(req, res
   else{
     atmos = 'nofeatures'
   }
+
+  //  const cafeImages = req.files.photos.map(f =>({url:f.path, filename:f.filename}));
+
   const tempComment = { //have to edit //add user id!!
     image:req.file&&req.file.path,  //에러 발생
+    filename:req.file&&req.file.filename,
     user:userID,
     content:comment,
     purpose:atmos,
@@ -217,6 +242,7 @@ app.post('/cafe/user/review/create/:id', upload.single('photos'), async(req, res
     }
   }
   cafe.comment.push(tempComment);
+  console.log('커맨트', tempComment);
   await cafe.save()
   res.send('Success!');
 });
@@ -229,6 +255,7 @@ app.post('/cafe/user/review/delete/:id', async(req, res)=>{
   )
   res.send('Delete ok');
 })
+
 app.get('/searched_cafe', async(req, res)=>{
   const searchTerm = req.query.searchingData;
   const results = await Cafe.find({
@@ -244,22 +271,36 @@ app.get('/searched_cafe', async(req, res)=>{
 })
 
 
-app.post('/test', upload.array('photos'), (req, res)=>{
-  console.log('Good');
-  console.log(req.files[0].path);
+const destroyImages = (parentOfImages) =>{
+  if(parentOfImages){
+    for(let element of parentOfImages){
+      if(element.filename) cloudinary.uploader.destroy(element.filename)
+    }
+  }
+}
 
-  res.send(req.files);
+app.post('/cafe/delete/:id', isLoggedIn, async (req, res)=>{
+  const id = req.params.id;
+  const cafe = await Cafe.findById(id);
+
+  for(let img of [cafe.images, cafe.repreMenu, cafe.menu, cafe.comment]){
+    destroyImages(img);
+  }
+  
+  await Cafe.findByIdAndDelete(id);
+
+  res.redirect('/cafe');
 })
+
 
 app.post('/cafe', upload.fields([{name:'photos'}, {name:'repreMenuPhoto'},{name:'menuPhoto'}]), async (req, res) => {
   const cafeData = req.body.cafe;
   const rePreMenuData = req.body.repreMenu;
   const menuData = req.body.menu;
+  const authorID = req.user&&req.user._id;
+
+
   // menu 배열 생성
-
-  console.log("파일스", req.files);
-  console.log("파일스2", req.files.menuPhoto);
-
   let menu;
   if(Array.isArray(menuData&&menuData.name)){
     menu = menuData && menuData.name.map((name, idx)=>({
@@ -291,6 +332,7 @@ app.post('/cafe', upload.fields([{name:'photos'}, {name:'repreMenuPhoto'},{name:
   const cafeImages = req.files.photos.map(f =>({url:f.path, filename:f.filename}));
 
   const cafe = new Cafe({
+    author:authorID,
     images:cafeImages,
     name: cafeData.name,
     menu: menu,
@@ -303,14 +345,12 @@ app.post('/cafe', upload.fields([{name:'photos'}, {name:'repreMenuPhoto'},{name:
   });
 
   await cafe.save();
-  console.log('카페', cafe);
   res.redirect('/cafe');
 });
 
 // app.get('/react', async(req, res)=>{
 //   res.sendFile('/react-page.html');
 // })
-
 
 
 app.delete('/cafe', async(req, res)=>{

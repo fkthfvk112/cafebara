@@ -563,6 +563,24 @@ function SetPage(probs) {
       break;
 }
 
+  const authorId = cafeData&&cafeData.author._id;
+  const currentUserId = probs.user.isLoggedIn&&probs.user.user._id;
+
+  const handleDeleteButton = async ()=>{
+    const url = window .location .pathname ;
+    const id = url .substring (url .lastIndexOf ('/') + 1 );
+    await axios.post(`http://localhost:8080/cafe/delete/${id}`)
+      .then((res)=>{
+        window.location.replace("http://localhost:8080/cafe");
+      })
+      .catch((err)=>{
+        console.log("Error : ", err);
+      })
+  }
+  const deleteButton = authorId === currentUserId?
+        <button style={{maxWidth:'500px'}}onClick={handleDeleteButton} type="button" class="btn btn-danger mb-3">카페 삭제</button>:
+        <div></div>
+  
   return (
     <div>
       <button className='topButton btn1' onClick={() => setPage(0)}>
@@ -574,15 +592,17 @@ function SetPage(probs) {
       <button className='topButton btn3' onClick={() => setPage(2)}>
         메뉴
       </button>
+      <div className='d-flex justify-content-center container row'>
       <BrowserRouter>
         <Routes className="d-flex justify-content-center"> 
           <Route path="/cafe/:id" element={content}></Route>
         </Routes>
+        {deleteButton}
         <span>
           <KakaoMap latitude={cafeData&&cafeData.latitude} longitude={cafeData&&cafeData.longitude}></KakaoMap>
         </span>
       </BrowserRouter>
-
+      </div>
     </div>
   );
 }

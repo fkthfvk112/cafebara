@@ -8,23 +8,22 @@
 </head>
 <body>
     <% layout('layouts/boilerplate') %>
-
     <div class="container mt-3">
         <div class="row justify-content-md-center text-center">
             <div class="card" style="width: 25rem;">
-                <form id="signUpForm" action="/user/signin" method="POST">
+                <form class="needs-validation" id="signUpForm" action="/user/signin" method="POST" novalidate>
                 <div class="card-body">
 
                 <h5 class="card-title">로그인</h5>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item row">
                         <label for="username">아이디</label>
-                        <input id="username" type="text" name="username">
+                        <input class="form-control" id="username" type="text" name="username" required>
                     </li>
 
                     <li class="list-group-item row">
                         <label for="password">비밀번호</label>
-                        <input id="password" type="password" name="password">
+                        <input class="form-control" id="password" type="password" name="password" required>
                     </li>
                 </ul>
                 <div style="text-align: end;">
@@ -40,3 +39,4 @@
 
 </body>
 </html>
+<script src="/js/valicationCheck.js"></script>
