@@ -11,3 +11,9 @@
   .hover_changeBg{
     background-color: aliceblue;
   }
+
+  .menuBackground{
+    border: 2px solid #e6e8e6;
+    border-radius: 15px;
+    padding-top: 10px;
+  }

@@ -195,7 +195,11 @@ function PageTwoSectionTwo(probs){
   async function submitForm(data) {
     const url = window.location.pathname;
     const id = url.substring(url.lastIndexOf('/') + 1);
-    await axios.post(`http://localhost:8080/cafe/user/review/delete/${id}`, {commentID: data})
+    await axios.delete(`http://localhost:8080/cafe/user/review/${id}`,{
+      data:{
+        commentID: data
+      } 
+    })
       .then((res) => {
         setDeleteToggle(true);
       })
@@ -286,7 +290,7 @@ function PageTwoSectionThree(probs) {
     const id = url.substring(url.lastIndexOf('/') + 1);
 
     console.log('데이터', data);
-    await axios.post(`http://localhost:8080/cafe/user/review/create/${id}`, data)
+    await axios.post(`http://localhost:8080/cafe/user/review/${id}`, data)
       .then((res) => {
         setFormState('');
         console.log(data);
@@ -569,7 +573,7 @@ function SetPage(probs) {
   const handleDeleteButton = async ()=>{
     const url = window .location .pathname ;
     const id = url .substring (url .lastIndexOf ('/') + 1 );
-    await axios.post(`http://localhost:8080/cafe/delete/${id}`)
+    await axios.delete(`http://localhost:8080/cafe/${id}`)
       .then((res)=>{
         window.location.replace("http://localhost:8080/cafe");
       })

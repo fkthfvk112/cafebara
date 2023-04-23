@@ -1,17 +1,18 @@
 
-<% if(success && success.length) {%>
+<% if(messages.success) {%>
     <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <%= success %><!-- success값이 없을 경우 empty array 즉, if(success)는 통과-->
+        <%= messages.success %>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-    <% } %>
+<% } %>
     
-    
-    
-    
-    <% if(error && error.length) {%>
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <%= error %>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        <% } %>
+<% if(messages.error) {%>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <%= messages.error %>
+    </div>
+<% } %>
+<script>
+    setTimeout(()=> {
+      document.querySelector('.alert').remove();
+    }, 5000);
+</script>
