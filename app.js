@@ -44,6 +44,9 @@ app.set('views', path.join(__dirname, 'views'));
 
 app.use(methodOverride('_method'));
 app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/public/client-react/build'));
+
+
 app.use(cors({
   origin: 'http://localhost:3000',
   credentials: true
@@ -88,19 +91,19 @@ app.get('/map', (req, res)=>{
 
 
 /* have to edit */
-// app.get('/searched_cafe', async(req, res)=>{ 
-//   const searchTerm = req.query.searchingData;
-//   const results = await Cafe.find({
-//     $or: [
-//       { name: { $regex: searchTerm, $options: 'i' } },
-//       { 'menu.name': { $regex: searchTerm, $options: 'i' } },
-//       { repreMenu: { $regex: searchTerm, $options: 'i' } }
-//     ]
-//   }).sort({ score: { $meta: 'textScore' } })
-//     .select({ score: { $meta: 'textScore' } }); // $meta projection 추가
-
-//   res.render('cafe', {cafes:results})
-// })
+app.get('/searched_cafe', async(req, res)=>{ 
+  const searchTerm = req.query.searchingData;
+  const results = await Cafe.find({
+    $or:[
+      {name:{ $regex : searchTerm, $options:'i'}},
+      {"menu.name":{ $regex : searchTerm, $options:'i'}},
+      {"repreMenu.name":{ $regex : searchTerm, $options:'i'}}
+    ]
+  }).sort({score:{$meta : 'textScore'}})
+    .select({ score: { $meta: 'textScore' } });
+    
+  res.render('cafe', {cafes:results})
+})
 
 app.use((err, req, res, next)=>{
   req.flash("error", `에러가 발생하였습니다.\n ${err}`);
@@ -111,6 +114,15 @@ app.delete('/cafe', async(req, res)=>{
     await Cafe.deleteMany({});
     res.redirect('/cafe');
 })
+
+app.get('/cafe/:id', (req, res)=>{
+  res.sendFile('/public/client-react/build/index.html', {root:'.'})
+})
+
+
+// app.get('/cafe/:id', (req, res)=>{
+//   res.render(__dirname + '/buld/index.ejs')
+// })
 
 app.listen(port, ()=>{
     console.log(`연결 : ${port}`)

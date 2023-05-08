@@ -22,17 +22,21 @@
                 <div class="row g-0">
                   <div class="col-md-4">
                     <div style="text-align: left;">
-                      <img class="m-1" src="<%= cafe.images[0].url %>" style="width: 200px; height: 200px; object-fit: contain;">
+                      <img class="m-3" src="<%= cafe.images[0].url %>" style="width: 200px; height: 200px; object-fit: contain;">
                     </div>
                   </div>
-                  <div class="col-md-8">
-                    <div class="card-body">
-                      <h5 class="card-title"><%= cafe.name %></h5>
+                  <div class="col-lg-7">
+                    <div class="card-body text-start">
+                      <h5 class="card-title mb-3 ms-2"><%= cafe.name %></h5>
                       <p class="card-text">위치 : <%= cafe.location %> </p>
                       <% let cnt = 0 %>
                       <% for(let menu of cafe.repreMenu) {%>
+                        <span class="card-text"><%= menu.name %>
+                        <% if(cnt != 2){%>
+                          ,
+                        <% } %>
                         <% cnt++ %>
-                        <p class="card-text">대표메뉴 <%= cnt %> : <%= menu.name %></p>
+                        </span>
                       <% }  %>
                     </div>
                   </div>
@@ -41,13 +45,11 @@
             </a>
         <% } %>
         </div>
-        <form action="/cafe?_method=DELETE" method="post">
-            <button>전부 삭제</button>
-        </form>
 <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
     crossorigin="anonymous">
+
 </script>
                     
 </body>

@@ -35,10 +35,13 @@
         </li>
       </ul>
       <span class="nav-item">
+        <a class="nav-link me-3" href="/user">User</a>
+      </span>
+      <span class="nav-item">
         <% if(!currentUser) { %>
           <a class="nav-link" href="/user/signin">Log in</a>
         <% } else{ %>
-          <a class="nav-link" href="/user/logout">Log out</a>
+          <a class="nav-link me-3" href="/user/logout">Log out</a>
         <% }%>
       </span>
     </div>

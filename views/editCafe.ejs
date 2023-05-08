@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="/stylesheets/cafe.css">
+
+    <title>카페 만들기</title>
+</head>
+<body>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=36ae5291fff272f636c29f53ee0e5ad5&libraries=services,clusterer"></script>
+    <!--수정 api값 숨기기-->
+    <% layout('layouts/boilerplate') %>
+
+    <div class="container">
+        <div class="row justify-content-md-center text-center">
+            <h1 class="my-3"> 카페 수정</h1>
+            <div class="card" style="width: 30rem;">
+                <form action="/cafe/edit/<%=cafe._id%>" class="needs-validation" method="POST" novalidate><!--enctype 추후 명시-->
+                <div class="card-body">
+
+                <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <div class="row text-center">
+                        <label style="display: block;" for="cafeNameInput">카페 이름</label>
+                        <input id="cafeNameInput" value="<%=cafe.name %>" class="form-control" data-bs-toggle="modal" data-bs-target="#locationModal"  type="text" name="cafe[name]"  required> <!-- readOnly로 수정 후 js 변경-->
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    <div class="row text-center mb-3">
+                        <label style="display: block;" for="cafeLocationInput">카페 위치</label>
+                        <input id="cafeLocationInput" value="<%=cafe.location %>" class="form-control" data-bs-toggle="modal" data-bs-target="#locationModal" type="text" name="cafe[location]"  required>
+                        <input id="inputLatitude"  value="<%=cafe.latitude %>"  style="display: none;" name="cafe[latitude]" readonly><!--위도 저장-->
+                        <input id="inputlongitude" value="<%=cafe.longitude %>"  style="display: none;" name="cafe[longitude]" readonly><!--경도 저장-->
+                        <div class='mt-3' id="map" style="width:100%;height:10rem;"></div>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    <div class=" flex-column mb-3">
+                        <h5>설명</h5>
+                        <textarea class="form-control" placeholder="카페 특징, 장점, 단점 등&#10;(최대 300자)" name="cafe[description]" id="" cols="40" rows="7" maxlength="300" required><%=cafe.description %></textarea>
+                    </div>
+                </li>   
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-center mb-3">
+                        <div id ="menus" class="row">
+                            <div class="row mb-3 menuBackground">
+                                <label class="form-label text-start">대표메뉴1</label>
+                                <input value="<%=cafe.repreMenu[0].name%>" class='menuName0 form-control mb-1' id="menuName" type="text" name="repreMenu[name]" style="margin-bottom: 3px;" required>
+                                <label class="form-label text-start">가격</label>
+                                <input value="<%=cafe.repreMenu[0].price%>" class='form-control mb-3' id='price' placeholder = '₩' type="number" name="repreMenu[price]" style="margin-bottom: 3px;" required>
+                                <textarea  class="form-control mb-1" name="repreMenu[description]" placeholder="메뉴 설명을 입력해주세요." required><%=cafe.repreMenu[0].description%></textarea>
+                                <input class="form-control mb-3" name="repreMenuPhoto" type="file">
+                            </div>
+                            <div class="row mb-3 menuBackground">
+                                <label class="form-label text-start">대표메뉴2</label>
+                                <input value="<%=cafe.repreMenu[1].name%>" class='menuName1 form-control mb-1' id="menuName" type="text" name="repreMenu[name]" style="margin-bottom: 3px;" required>
+                                <label class="form-label text-start">가격</label>
+                                <input value="<%=cafe.repreMenu[1].price%>" class='form-control mb-3' id='price' placeholder = '₩' type="number" name="repreMenu[price]" style="margin-bottom: 3px;" required>
+                                <textarea class="form-control mb-1" name="repreMenu[description]" placeholder="메뉴 설명을 입력해주세요." required><%=cafe.repreMenu[1].description%></textarea>
+                                <input class="form-control mb-3" name="repreMenuPhoto" type="file">
+                            </div>
+                            <div class="row mb-3 menuBackground">
+                                <label class="form-label text-start">대표메뉴3</label>
+                                <input value="<%=cafe.repreMenu[2].name%>" class='menuName2 form-control mb-1' id="menuName" type="text" name="repreMenu[name]" style="margin-bottom: 3px;" required>
+                                <label class="form-label text-start">가격</label>
+                                <input value="<%=cafe.repreMenu[2].price%>" class='form-control mb-3' id='price' placeholder = '₩' type="number" name="repreMenu[price]" style="margin-bottom: 3px;" required>
+                                <textarea class="form-control mb-1" name="repreMenu[description]" placeholder="메뉴 설명을 입력해주세요." required><%=cafe.repreMenu[2].description%></textarea>
+                                <input class="form-control mb-3" name="repreMenuPhoto" type="file">
+                            </div>
+                            <div id ="menuDiv" class="row">
+                                <% for(menu of cafe.menu){ %>
+                                    <div class="row mb-3 menuBackground d-flex justify-content-center ">
+                                        <label class="form-label text-start">메뉴명</label>
+                                        <input value="<%=menu.name%>" class='menuName1 form-control mb-1' id="menuName" type="text" name="menu[name]" style="margin-bottom: 3px;" required>
+                                        <label class="form-label text-start">가격</label>
+                                        <input value="<%=menu.price%>" class='form-control mb-3' id='price' placeholder = '₩' type="number" name="menu[price]" style="margin-bottom: 3px;" required>
+                                        <textarea class="form-control mb-1" name="menu[description]" placeholder="메뉴 설명을 입력해주세요." required><%=menu.description%></textarea>
+                                        <div class="text-start mt-3">현재 사진</div>
+                                        <img class ="mb-3" style="width: 130px; " src="<%=menu.imgUrl%>"/>
+                                        <div class="text-start">새사진으로 수정</div>
+                                        <input class="form-control mb-3" name="menuPhoto" type="file">
+                                    </div>    
+                                <% } %>
+                            </div>
+                        </div><!--imgUrl조정-->
+                    </div>
+                    <div class="card-body" style="padding-top:2px">
+                        <button id="addMenuBtn"class ="btn btn-success" style="width: 3em; text-align: center;">+</button>
+                        <button id="deleteMenuBtn"class ="btn btn-success" style="width: 3em; text-align: center;">-</button>
+                     </div>  
+                </li>
+                    <li class="list-group-item">
+                        <div id ="menus" class=" flex-column mb-3">
+                        </div>
+                        <h5>카페 사진</h5>
+                        <input class="form-control" type="file" name="photos" multiple>
+                    </li>
+                </ul>
+                <div class="card-body">
+                    <button class="btn btn-primary btn-sm mx-3">확인</button>
+                    <button class="btn btn-secondary btn-sm mx-3">취소</button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+<!--모달-->
+<div class="modal fade" id="locationModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">주소 검색</h1>
+          <button id="closeModalBtn" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form id="modalFrom" class="text-center">
+                <input id="locationSearch" type="text">
+                <button id="locationSearchBtn" type="button"  class="btn btn-primary">검색</button>
+                <div id="locationSearchContainer" class="scroll-container" style="height: 200px; overflow: auto;">
+
+                </div>
+                  
+            </form>
+        </div>
+        <div class="modal-footer">
+          <button id="closeLocationBtn" type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+          <button id="saveLocationBtn" type="button" class="btn btn-primary" data-bs-dismiss="modal">저장</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+    <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+    crossorigin="anonymous">
+</script>
+</body>
+</html>
+
+<script>
+    const repre0 = document.querySelector('#repre0')
+    const repre1 = document.querySelector('#repre1')
+    const repre2 = document.querySelector('#repre2')
+
+    const menuName0 = document.querySelector('.menuName0')
+    const menuName1 = document.querySelector('.menuName1')
+    const menuName2 = document.querySelector('.menuName2')
+
+    const addMenuBtn = document.querySelector('#addMenuBtn')
+    const menus = document.querySelector('#menuDiv')
+    const deleteMenuBtn = document.querySelector('#deleteMenuBtn')
+    const closeLocationBtn = document.querySelector('#closeLocationBtn')
+    const closeModalBtn = document.querySelector('#closeModalBtn')
+
+    const modalFrom = document.querySelector('#modalFrom');
+
+    modalFrom.addEventListener('keydown', (evt)=>{
+        if(evt.key == 'Enter'){
+            evt.preventDefault();
+        }
+    })
+    let inputCnt = 0;
+    addMenuBtn.addEventListener('click', e=>{
+        e.preventDefault();
+        const newInput = document.createElement('input');
+        const row = document.createElement('div');
+        row.setAttribute('class', 'row mb-3 menuBackground');
+        newInput.setAttribute('id', 'menuName');
+        newInput.setAttribute('name', 'menu[name]');
+        newInput.setAttribute('style', 'margin-bottom:3px');
+        newInput.setAttribute('class', 'form-control mb-1');
+        newInput.setAttribute('required', true);
+
+        const priceInput = document.createElement('input');
+        priceInput.setAttribute('type', 'number');
+        priceInput.setAttribute('id', 'price');
+        priceInput.setAttribute('placeholder', '₩');
+        priceInput.setAttribute('name', 'menu[price]');
+        priceInput.setAttribute('style', 'margin-bottom:3px');
+        priceInput.setAttribute('class', 'form-control mb-3');
+        priceInput.setAttribute('required', true);
+
+        const textArea = document.createElement('textarea');
+        textArea.setAttribute('name', 'menu[description]');
+        textArea.setAttribute('placeholder', '메뉴 설명을 입력하세요.');
+        textArea.setAttribute('class', 'form-control mb-1');
+        textArea.setAttribute('required', true);
+
+        const fileInput = document.createElement('input');
+        fileInput.setAttribute('type', 'file');
+        fileInput.setAttribute('class', 'form-control mb-3');
+        fileInput.setAttribute('name', 'menuPhoto');
+        //fileInput.setAttribute('required', true);
+        //<label for="inputPassword5" class="form-label">Password</label>
+
+        const nameLabel = document.createElement('label');
+        nameLabel.setAttribute('class', 'form-label text-start');
+        nameLabel.innerHTML = "메뉴명";
+
+        const priceLabel = document.createElement('label');
+        priceLabel.setAttribute('class', 'form-label text-start');
+        priceLabel.innerHTML = "가격";
+
+        row.append(nameLabel);
+        row.append(newInput);
+
+        row.append(priceLabel);
+        row.append(priceInput);
+        row.append(textArea);
+        row.append(fileInput);
+
+        menus.append(row);
+
+    })
+
+    deleteMenuBtn.addEventListener('click', e=>{
+        e.preventDefault();
+        menus.removeChild(menus.lastChild)
+        
+    })
+
+    let container = document.getElementById('map');
+	let options = {
+		center: new kakao.maps.LatLng(35.23278717517533, 129.082898448971),
+		level: 3,
+        draggable: true
+	};
+
+	let map = new kakao.maps.Map(container, options);
+    let places = new kakao.maps.services.Places();
+    map.setLevel(2);
+    places.setMap(map);
+
+    const markers = [];
+
+    let clusterer = new kakao.maps.MarkerClusterer({
+    map: map,
+    markers: markers,
+    gridSize: 35,
+    averageCenter: true,
+    minLevel: 6,
+    disableClickZoom: true,
+    styles: [{
+        width : '53px', height : '52px',
+        background: 'url(cluster.png) no-repeat',
+        color: '#fff',
+        textAlign: 'center',
+        lineHeight: '54px'
+    }]
+});
+
+    /* location / map처리 */
+    let locationTags = [];
+    let locationObjectArr = [];
+    let result_locationObject = {};
+    
+    const saveLocationBtn = document.querySelector('#saveLocationBtn');
+    const locationSearchContainer = document.querySelector('#locationSearchContainer');
+    const locationSearch = document.querySelector('#locationSearch');
+    const locationSearchBtn = document.querySelector('#locationSearchBtn');
+    const cafeNameInput = document.querySelector('#cafeNameInput');
+    const cafeLocationInput = document.querySelector('#cafeLocationInput');
+
+    const inputLatitude = document.querySelector('#inputLatitude');
+    const inputlongitude = document.querySelector('#inputlongitude');
+
+    function childIndex(child){
+        const children = child.parentElement.children;
+        let i = 0;
+        for(i = 0; i < children.length; i++){
+            if(children[i] == child){
+                break;
+            }
+        }
+        return i;
+    }
+
+    locationSearchBtn.addEventListener('click', async e=>{
+        e.preventDefault();
+        locationSearchContainer.innerHTML = '';
+        var places = new kakao.maps.services.Places();
+        var callback = await function(result, status) {
+            locationObjectArr = [];
+            locationTags = [];
+            if (status === kakao.maps.services.Status.OK) {
+                for(element of result){
+                    let temp = document.createElement("div");
+                    let tempObj = {
+                        name : element.place_name,
+                        location : element.road_address_name,
+                        x : element.x,
+                        y : element.y
+                    };
+                    locationObjectArr.push(tempObj);
+                    temp.innerText = `${element.place_name} (${element.road_address_name})`;//태그 설정
+                    temp.setAttribute('class', 'mb-1')
+                    locationTags.push(temp);
+                    locationSearchContainer.appendChild(temp);
+                };
+                locationTags.forEach(e=>{
+                    e.addEventListener('click', evt=>{
+                        result_locationObject =  locationObjectArr[childIndex(e)];
+                        locationSearch.value = result_locationObject?result_locationObject.name:"";
+
+                        clusterer.clear();
+                        let marker = new kakao.maps.Marker({
+                            position: new kakao.maps.LatLng(result_locationObject.y, result_locationObject.x)
+                        });
+                        map.setCenter(new kakao.maps.LatLng(result_locationObject.y , result_locationObject.x));
+                        clusterer.addMarker(marker);
+                    })
+
+                    e.addEventListener('mouseenter', ()=>{
+                        e.classList.add('hover_changeBg');
+                    })
+
+                    e.addEventListener('mouseleave', ()=>{
+                        e.classList.remove('hover_changeBg');
+                    })
+                })
+            }
+        };
+        places.keywordSearch(locationSearch.value, callback);
+    })
+
+    const resetModalInputs = ()=>{
+        locationSearchContainer.innerHTML = '';
+        locationSearch.value = '';
+    }
+
+    saveLocationBtn.addEventListener('click', e=>{
+        e.preventDefault();
+        cafeNameInput.value =  result_locationObject.name?result_locationObject.name:"";
+        cafeLocationInput.value = result_locationObject.location?result_locationObject.location:"";
+        inputLatitude.value = result_locationObject?result_locationObject.y:"";
+        inputlongitude.value = result_locationObject?result_locationObject.x:"";
+        resetModalInputs();
+    })
+    
+
+
+    closeLocationBtn.addEventListener('click', ()=>{
+        resetModalInputs();
+    })
+
+    closeModalBtn.addEventListener('click', ()=>{
+        resetModalInputs();
+    })
+
+
+</script>
+<script>
+// Example starter JavaScript for disabling form submissions if there are invalid fields
+(() => {
+  'use strict'
+
+  // Fetch all the forms we want to apply custom Bootstrap validation styles to
+  const forms = document.querySelectorAll('.needs-validation')
+
+  // Loop over them and prevent submission
+  Array.from(forms).forEach(form => {
+    form.addEventListener('submit', event => {
+      if (!form.checkValidity()) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+
+      form.classList.add('was-validated')
+    }, false)
+  })
+})()
+
+</script>

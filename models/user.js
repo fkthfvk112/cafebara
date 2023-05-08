@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Cafe = require('./cafe');
 const passportLocalMongoose = require('passport-local-mongoose');
 
 const Schema = mongoose.Schema;
@@ -14,13 +15,13 @@ const userSchema = new Schema({
         required:true,
         unique:true
     },
-    reviewedCafe:[{
+
+    commentedCafe:[{
         type:Schema.Types.ObjectId,
         ref:'Cafe'
     }],
     comments: [{
         type: Schema.Types.ObjectId,
-        ref: 'Comment'
       }],
     likes:[{
         type: Schema.Types.ObjectId,

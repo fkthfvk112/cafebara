@@ -1,0 +1,45 @@
+      /* 메인 내용을 감싸고 있는 div를 가리키는 클래스 */
+      
+      body{
+        background-color: #f1f1f1;
+      }
+      .main {
+        margin-left: 160px; /* 사이드바 너비 만큼 왼쪽으로 이동 */
+      }
+
+      /* 사이드바 영역을 가리키는 클래스 */
+      .sidebar {
+        height: 100%; /* 높이를 100%로 설정하여 화면 전체를 차지하도록 함 */
+        width: 160px; /* 너비를 160px로 설정 */
+        position: fixed; /* 화면 스크롤과 상관없이 고정되도록 설정 */
+        top: 0;
+        left: 0;
+        background-color: #03045e; /* 배경색 지정 */
+        overflow-x: hidden; /* x축 스크롤 막기 */
+        padding-top: 20px; /* 상단 여백 */
+      }
+
+      /* 사이드바 안의 링크에 대한 스타일링 */
+      .sidebar a {
+        display: block; /* 링크를 블록 요소로 설정하여 전체 영역에 대한 클릭이 가능하도록 함 */
+        color: #e0e1dd; /* 글자색 지정 */
+        padding: 16px; /* 패딩 추가 */
+        text-decoration: none; /* 밑줄 제거 */
+      }
+
+      /* 링크에 마우스를 올렸을 때의 스타일링 */
+      .sidebar a:hover {
+        background-color: #555; /* 배경색 변경 */
+        color: white; /* 글자색 변경 */
+      }
+
+
+.userInfoContainer{
+  background-color:white;
+  margin: 15px;
+}
+
+.userInfo2Container{
+  background-color:white;
+  margin: 15px;
+}

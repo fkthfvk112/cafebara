@@ -9,6 +9,7 @@ const upload = multer({ storage:storage});
 const {isLoggedIn} = require('../controller/middleware')
 // /cafe로 시작하는 주소
 
+
 router.route('/')
     .get(cafes.showCafes)
     .post(upload.fields([{name:'photos'}, {name:'repreMenuPhoto'},{name:'menuPhoto'}]), cafes.creatCafe)
@@ -28,5 +29,9 @@ router.route('/create')
 router.route('/user/review/:id')
     .delete(isLoggedIn, cafes.deleteReview)
     .post(upload.single('photos'), cafes.createReview)
+
+router.route('/edit/:id')
+    .get(cafes.editCafePage)
+    .post(cafes.editCafe);    
     
 module.exports = router;

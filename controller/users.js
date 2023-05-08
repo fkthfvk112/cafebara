@@ -1,3 +1,8 @@
+const Cafe = require('../models/cafe');
+const User = require('../models/user');
+const mongoose = require('mongoose');
+const { ObjectId } = mongoose.Types;
+
 
 module.exports.sendSignUp = async(req,res)=>{
     res.render('signUp');
@@ -64,3 +69,52 @@ module.exports.isLogInAPI = async(req, res)=>{
           });
         };
       };
+
+module.exports.likeCafe = async(req, res)=>{ //로그인하지 않앗을때 처리 잘 되나?
+  
+
+    let heartToggle = 0;
+
+    const userID = req.user&&req.user._id;
+    const cafeID = req.params.id;
+
+    const user = await User.findById(userID);
+    
+    const exist = user&&user.likes.some(cafe => cafe._id.equals(cafeID));
+    console.log(exist);
+    if(exist){
+      await User.updateOne({_id: userID}, {$pull: {likes:cafeID}});
+      heartToggle = 0;
+    }
+    else{
+      await User.updateOne({_id:userID}, {$push:{likes:cafeID}});
+      heartToggle = 1;
+    }
+    const user2 = await User.findById(userID); 
+    console.log("Like Result ", user2);
+
+  res.send(String(heartToggle));
+}
+
+
+ module.exports.user = async(req, res)=>{
+//   const userID = req.user&&req.user._id;
+//   const user = await User.findById(userID).populate('commentedCafe');
+//   console.log(user);
+
+//   const commentArr = [];
+//   user.commentedCafe.map((cafe)=>{
+//     for(let cafeCom of cafe.comment){
+//       if(cafeCom.user.toString() === userID.toString()){
+//         let tempCafeObj = {
+//           cafeId:cafe._id,
+//           comment:cafeCom.content
+//         }
+//         commentArr.push(tempCafeObj);
+//       }
+//     }
+//   })
+//   console.log("배열", commentArr);
+
+  res.render('user');//클라이언트측 진행
+}

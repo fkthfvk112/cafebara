@@ -12,9 +12,9 @@ import React, { useState, useEffect } from 'react';
 const grayColor = '#edede9';
 axios.defaults.withCredentials = true;
 
-
 function PageOne(probs){
   const [ratings, setRatings] = useState();
+  const [heart, setHeart] = useState(0);
   const handleAtmos = ()=>{
     let cntStudy = 0;
     let cntTalk = 0;
@@ -41,12 +41,15 @@ function PageOne(probs){
     }
     
   }
+
   useEffect(()=>{
     const fetchData = async()=>{
       try{
         const response = await axios.get(`http://localhost:8080/cafe/api/totalRating/${probs.id}`);
-        console.log('입력 데이터', response.data);
         setRatings(response.data);
+
+        const heartToggle = await axios.get(`http://localhost:8080/user/like/${probs.id}`);
+        setHeart(heartToggle.data);
       }
       catch(e){
         console.log(e);
@@ -81,6 +84,17 @@ function PageOne(probs){
     return resultText;
   }
 
+  const handleHeartBtn  = async()=>{
+        try{
+          const fetchedData = await axios.get(`http://localhost:8080/user/like/${probs.id}`);
+          setHeart(fetchedData.data);
+        }
+        catch(e){
+          console.log(e);
+        }
+    }
+  
+  
   const images = probs.cafeData?probs.cafeData.images:[{url:''}];
   return(
     <div className="row" style={{width:'50vw', maxWidth:'850px', minWidth:'360px'}} >
@@ -103,7 +117,12 @@ function PageOne(probs){
         </div>
         <div className="offset-1 col-7">
           <div className="row">{/*댓글*/}
-            <span className='text-start'>{probs.cafeData?probs.cafeData.description:'No'}</span>
+            <div className='text-end'>
+              <button onClick={handleHeartBtn} className ={`mt-3 heartBtn`}>
+                {heart===1?"❤":"🤍"} Like
+              </button>
+            </div>
+            <span className='text-start'>{probs.cafeData?probs.cafeData.description:'No'}</span>{/*카페설명*/}
           </div>
         </div>
       </div>
@@ -557,7 +576,7 @@ function SetPage(probs) {
   let content = null;
   switch(pageNumber){
     case 0:
-      content = <PageOne  id={id} setCafeData={setCafeData} cafeData={cafeData}></PageOne>
+      content = <PageOne user ={probs.user} id={id} setCafeData={setCafeData} cafeData={cafeData}></PageOne>
       break;
     case 1:
       content = <PageTwo isLoggedIn={probs.isLoggedIn} user={probs.user}></PageTwo>
@@ -570,6 +589,12 @@ function SetPage(probs) {
   const authorId = cafeData&&cafeData.author._id;
   const currentUserId = probs.user.isLoggedIn&&probs.user.user._id;
 
+  const handlEditeButton = async() => {
+    const url = window .location .pathname ;
+    const id = url .substring (url .lastIndexOf ('/') + 1 );
+    window.location.href = `http://localhost:8080/cafe/edit/${id}`;
+  }
+
   const handleDeleteButton = async ()=>{
     const url = window .location .pathname ;
     const id = url .substring (url .lastIndexOf ('/') + 1 );
@@ -581,9 +606,16 @@ function SetPage(probs) {
         console.log("Error : ", err);
       })
   }
+
+  const editButton = authorId === currentUserId?
+  <button style={{maxWidth:'500px'}}onClick={handlEditeButton} type="button" class="btn btn-primary mb-3">수정</button>:
+  <div></div>
+  
   const deleteButton = authorId === currentUserId?
         <button style={{maxWidth:'500px'}}onClick={handleDeleteButton} type="button" class="btn btn-danger mb-3">카페 삭제</button>:
         <div></div>
+
+
   
   return (
     <div>
@@ -601,6 +633,7 @@ function SetPage(probs) {
         <Routes className="d-flex justify-content-center"> 
           <Route path="/cafe/:id" element={content}></Route>
         </Routes>
+        {editButton}
         {deleteButton}
         <span>
           <KakaoMap latitude={cafeData&&cafeData.latitude} longitude={cafeData&&cafeData.longitude}></KakaoMap>

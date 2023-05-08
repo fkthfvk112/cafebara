@@ -4,7 +4,8 @@ const users = require('../controller/users');
 const {isLoggedIn} = require('../controller/middleware')
 const passport = require('passport');
 
-
+router.route('/')
+    .get(users.user);
 
 router.route('/signup')
     .get(users.sendSignUp)
@@ -23,5 +24,8 @@ router.route('/logout')
 
 router.route('/api/islogIn')
     .get(users.isLogInAPI)
+
+router.route('/like/:id')
+    .get(users.likeCafe)
 
 module.exports = router;
