@@ -6,7 +6,9 @@
       .main {
         margin-left: 160px; /* 사이드바 너비 만큼 왼쪽으로 이동 */
       }
-
+      a{
+        text-decoration:none;
+      }
       /* 사이드바 영역을 가리키는 클래스 */
       .sidebar {
         height: 100%; /* 높이를 100%로 설정하여 화면 전체를 차지하도록 함 */
@@ -14,7 +16,7 @@
         position: fixed; /* 화면 스크롤과 상관없이 고정되도록 설정 */
         top: 0;
         left: 0;
-        background-color: #03045e; /* 배경색 지정 */
+        background-color: #212529; /* 배경색 지정 */
         overflow-x: hidden; /* x축 스크롤 막기 */
         padding-top: 20px; /* 상단 여백 */
       }
@@ -33,13 +35,80 @@
         color: white; /* 글자색 변경 */
       }
 
+      @media screen and (max-width: 800px) {
+        .sidebar {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 60px;
+          background-color: #212529;
+          padding-top: 10px;
+          padding-bottom: 10px;
+        }
+        
+        .sidebar a {
+          display:inline-block;
+        }
+        
+        .navbar-toggler {
+          display: block !important;
+        }
+
+        .main{
+          margin: 0px;
+        }
+      }
+
 
 .userInfoContainer{
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5); 
+  min-width: 250px;
+  max-height: 200px;
   background-color:white;
   margin: 15px;
 }
 
 .userInfo2Container{
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5); 
+  min-width: 300px;
   background-color:white;
   margin: 15px;
+}
+
+.commentContainer{
+  border: 2px solid #1c2541;
+  border-radius: 5px;
+  margin-bottom:15px;
+}
+
+.userInfoContainer3{
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  background-color:white;
+  margin: 30px;
+  padding: 20px;
+  transition: all 0.1s ease-in-out;
+}
+
+.commentContainer:hover{
+  transform: translateY(-2px); /* 위로 5px 이동 */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+
+
+.likeCafeContainer{
+  border: 2px solid #1c2541;
+  padding:10px;
+  transition: all 0.1s ease-in-out;
+}
+
+.likeCafeContainer:hover {
+  transform: translateY(-2px); /* 위로 5px 이동 */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.changeOrDelete{
+  color:#403d39;
+  text-decoration: underline;
 }

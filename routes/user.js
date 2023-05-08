@@ -5,7 +5,7 @@ const {isLoggedIn} = require('../controller/middleware')
 const passport = require('passport');
 
 router.route('/')
-    .get(users.user);
+    .get(isLoggedIn, users.user);
 
 router.route('/signup')
     .get(users.sendSignUp)

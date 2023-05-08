@@ -1,6 +1,7 @@
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
+<nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark"
+  style="position:fixed; top:0px; width:100%; z-index: 2;">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">Navbar</a>
+    <a class="navbar-brand" href="/">Cafebara</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -26,22 +27,23 @@
             <li><a class="dropdown-item" href="#">Something else here</a></li>
           </ul>
         </li>
-        <li class="nav-item">
-          <form class="d-flex" role="search">
-            <button type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">
-              <img width = "25px" height = "25px" src="/images/magnifier.png" alt="">
-            </button>
-          </form>
-        </li>
       </ul>
-      <span class="nav-item">
-        <a class="nav-link me-3" href="/user">User</a>
+      <span class="nav-item me-3">
+        <form class="d-flex" role="search">
+          <button class="mt-1" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            <span style="margin-right: 80px;">검색</span>        
+            <img width = "25px" height = "25px" src="/images/magnifier.png" alt="">
+          </button>
+        </form>
       </span>
       <span class="nav-item">
+        <a class="nav-link me-3" href="/user" style="color:#F8F9FAA6">내 정보</a>
+      </span>
+      <span class="nav-item me-2">
         <% if(!currentUser) { %>
-          <a class="nav-link" href="/user/signin">Log in</a>
+          <a class="nav-link" href="/user/signin"  style="color:#F8F9FAA6">로그인</a>
         <% } else{ %>
-          <a class="nav-link me-3" href="/user/logout">Log out</a>
+          <a class="nav-link me-3" href="/user/logout"  style="color:#F8F9FAA6">로그아웃</a>
         <% }%>
       </span>
     </div>

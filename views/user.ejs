@@ -1,19 +1,57 @@
 
 <% layout('layouts/userBoilerplate.ejs') %>
 <div class="main">
-    <div class="container">
-        <h1 class="m-3">사용자 정보</h1>
-        <div class="row">
-            <div class="col-5 userInfoContainer pb-3 pt-3">
-                   <h3>회원정보</h3>
-                   <div>닉네임</div>
-                   <div style="border-bottom: 2px solid #adb5bd; font-weight: bold;">지미</div>
-                   <div>이메일</div>
-                   <div style="border-bottom: 2px solid #adb5bd; font-weight: bold;" >sdfsdf@nae.com</div>
+    <div class="container d-flex flex-column justify-content-center">
+        <div id="userInfo">
+            <h1 style="margin: 100px 0px 30px 50px">사용자 정보</h1>
+            <div class="row">
+                <div class="col-5 d-flex flex-column justify-content-center m-3">
+                    <div class="userInfoContainer p-3">
+                        <h3>회원정보</h3>
+                        <div>닉네임</div>
+                        <div style="border-bottom: 2px solid #adb5bd; font-weight: bold;"><%=allUserInfo.nickName%></div>
+                        <div>이메일</div>
+                        <div style="border-bottom: 2px solid #adb5bd; font-weight: bold;" ><%=allUserInfo.email%></div>
+                    </div>
+                    <div class="text-center">
+                        <div class="changeOrDelete">비밀번호 변경</div>
+                        <div class="changeOrDelete">회원 탈퇴</div>
+                    </div>
+                </div>
+                <div class="col-6 userInfo2Container m-3">
+                    <h3 class="mt-3 mb-3">내가 쓴 댓글</h3>
+                    <div class="row">
+                        <% for(let comment of allUserInfo.comments){ %>
+                            <a href="/cafe/<%=comment.cafeId%>" style="text-decoration:none; color:black;">
+                                <div class="commentContainer pt-2 ps-2">
+                                    <div><%=comment.cafeName%></div>
+                                    <p class="ms-2"><%=comment.comment%></p>
+                                </div>
+                            </a>
+                        <% } %>
+                    </div>
+                </div>
             </div>
-            <div class="col-5 userInfo2Container">
-                <h3>내가 쓴 댓글</h3>
+        </div>
+        <hr>
+        <div id="likeCafe" style="margin-bottom: 100px;">
+            <h1  style="margin-left:100px; margin-top:100px; margin-bottom:50px">내 찜 목록</h1>
+            <div class="d-flex justify-content-center">
+                <div class="row userInfoContainer3">
+                    <h4>찜한 카페</h4>
+                    <% for(let likeCafe of allUserInfo.likes){ %>
+                        <a href="/cafe/<%=likeCafe._id%>" style="text-decoration:none; color:black;">
+                            <div class="likeCafeContainer">
+                                <div class="d-flex justify-content-between">
+                                    <span class="ms-1"><%=likeCafe.name%></span>
+                                    <button class="me-3">❤</button><!--have to 눌러서 찜 삭제 axios-->
+                                </div>
+                                <p><%=likeCafe.description%></p>
+                            </div>
+                        </a>
+                    <% }%>
+                </div>
             </div>
-        </div>  
+        </div>
     </div>
 </div>

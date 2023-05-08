@@ -98,23 +98,40 @@ module.exports.likeCafe = async(req, res)=>{ //로그인하지 않앗을때 처�
 
 
  module.exports.user = async(req, res)=>{
-//   const userID = req.user&&req.user._id;
-//   const user = await User.findById(userID).populate('commentedCafe');
-//   console.log(user);
+  const userID = req.user&&req.user._id;
+  const user = await User.findById(userID)
+              .populate('commentedCafe')
+              .populate('likes');
+  console.log(user);
 
-//   const commentArr = [];
-//   user.commentedCafe.map((cafe)=>{
-//     for(let cafeCom of cafe.comment){
-//       if(cafeCom.user.toString() === userID.toString()){
-//         let tempCafeObj = {
-//           cafeId:cafe._id,
-//           comment:cafeCom.content
-//         }
-//         commentArr.push(tempCafeObj);
-//       }
-//     }
-//   })
-//   console.log("배열", commentArr);
+  const commentArr = [];
+  user.commentedCafe.map((cafe)=>{
+    for(let cafeCom of cafe.comment){
+      if(cafeCom.user.toString() === userID.toString()){
+        let tempCafeObj = {
+          cafeId:cafe._id,
+          cafeName:cafe.name,
+          comment:cafeCom.content
+        }
+        commentArr.push(tempCafeObj);
+      }
+    }
+  })
 
-  res.render('user');//클라이언트측 진행
+  //추후 필터 적용하려면 axios
+  const likeCafeArr = [];
+  user.likes.map(async(cafe)=>{
+    likeCafeArr.push(cafe);
+  })
+
+    const allUserInfo = {
+      nickName:user.nickName,
+      email:user.email,
+      comments:commentArr,
+      likes:likeCafeArr
+    }
+
+    console.log("올 아이템, ", allUserInfo);
+
+  res.render('user', {allUserInfo});//클라이언트측 진행
 }
