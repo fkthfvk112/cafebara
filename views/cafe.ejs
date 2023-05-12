@@ -19,15 +19,19 @@
       <div class="row">
         <div class="text-center m-3" style="color:#2b2d42">
           <span class="filterText1" style="color:black">Search your cafe</span>
-          <span class="filterText2">menu</span>
-          <span class="filterText3">name</span>
-          <span class="filterText4">location/star/review</span>
+          <span  class ="filterText2To4">
+            <span class="filterText2">menu</span>
+            <span class="filterText3">name</span>
+            <span class="filterText4">location/star/review</span>
+          </span>
         </div>
-        <form>
+        <form action="/cafe/filter"class="d-flex justify-content-center filterForm">
           <div class="filterContainer">
-            <input type="text" size="30">
-            <select>
-              <option>
+            <input style="min-width: 250px; width:40%;" type="text" name="filter[filterInput]">
+            <input class="userLocation" style="display:none;" name="filter[userLocation]">
+            <div class="selectContainer">
+            <select name = filter[filter1]>
+              <option value="study">
                 공부
               </option>
               <option value="talk">
@@ -36,31 +40,32 @@
               <option value="takeOut">
                 테이크아웃
               </option>
-              <option value="noSelect" selected>
-                선택 안함
+              <option value="" selected>
+                선택 안 함
               </option>
             </select>
-            <select>
+            <select class="select2" name = filter[filter2]>
               <option value="highStar">
                 별점 높은 순
               </option>
               <option value="lowStar">
                 별점 낮은 순
               </option>
-              <option value="highStar">
+              <option value="highReview">
                 리뷰 많은 순
               </option>
-              <option>
+              <option  value="lowReview">
                 리뷰 적은 순
               </option>
-              <option>
+              <option class="close" value="closeToMe">
                 거리 가까운 순
               </option>
-              <option selected>
+              <option selected value="">
                 선택 안 함
               </option>
             </select>
-            <button>
+          </div>
+            <button type="button" class="filterBtn">
               검색
             </button>
           </div>
@@ -68,6 +73,7 @@
       </div>
     </section>
     <section>
+
       <div class="container" style="margin-top: 100px; margin-bottom: 100px;">
           <% for(let cafe of cafes) { %>
             <a class='card_link' href="/cafe/<%= cafe._id %>">
@@ -109,3 +115,43 @@
 </body>
 
 </html>
+<script>
+  const select2 = document.querySelector(".select2");
+  const filterForm = document.querySelector(".filterForm");
+  const filterBtn = document.querySelector(".filterBtn");
+  const close = document.querySelector(".close");
+  const userLocation = document.querySelector(".userLocation");
+
+  filterBtn.addEventListener('click', async()=>{
+    if(select2.value === "closeToMe"){
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+      } else {
+        alert("브라우저에서 현재 위치 정보를 지원하지 않습니다.")
+        console.log("Geolocation is not supported by this browser.");
+      }
+
+       function successCallback(position) {
+        const location = {
+          latitude:position.coords.latitude,
+          longitude:position.coords.longitude
+        }
+        console.log("Latitude: " + position.coords.latitude +
+        ", Longitude: " + position.coords.longitude);
+        console.log(JSON.stringify(location));
+        userLocation.value = JSON.stringify(location);
+        filterForm.submit();
+      }
+
+      function errorCallback(error) {
+        console.log("Unable to retrieve your location due to " + error.code + ": " + error.message);
+      }
+    }
+    else{
+      filterForm.submit();
+    }
+  })
+
+  //get user's geo
+
+</script>

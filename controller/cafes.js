@@ -108,9 +108,6 @@ module.exports.deleteReview = async(req, res)=>{
       {_id:req.params.id},
       {$pull:{comment:{_id:comment_id}}}
     )
-    
-    console.log("코맨트 아이디", comment_id)
-    console.log("우저 아ㅣ이디", userId);
 
     await User.updateOne(
       {_id:userId},
@@ -132,16 +129,18 @@ module.exports.createReview = async(req, res) => {
     const atmosRate = req.body.atmosRate;
     const priceRate = req.body.priceRate;
     let atmos;
-    if(req.body.study){
+
+    console.log("보디", req.body);
+
+    if(req.body.study === 'true'){
       atmos = 'study';
     }
-    else if(req.body.talk){
+    else if(req.body.talk === 'true'){
       atmos = 'talk';
     }
     else{
       atmos = 'nofeatures'
-    }
-  
+    }  
     const tempComment = {
       image:req.file&&req.file.path,
       filename:req.file&&req.file.filename,
@@ -309,4 +308,83 @@ module.exports.editCafe = async(req, res, next)=>{//have to edit
     return next(err);
   }
   res.redirect('/cafe');
+}
+
+const sortByRatingDec = (documents)=>{
+  documents.sort((a, b)=> b.ratingAVGtotal - a.ratingAVGtotal);
+}
+
+const sortByRatingAsc = (documents)=>{
+  documents.sort((a, b)=> a.ratingAVGtotal - b.ratingAVGtotal);
+}
+
+const sortByReviewHigh = (documents)=>{
+  documents.sort((a, b)=> b.reviewCnt - a.reviewCnt);
+}
+
+const sortByReviewLow = (documents)=>{
+  documents.sort((a, b)=> a.reviewCnt - b.reviewCnt);
+}
+
+const sortByCloseLocationAsc = (documents, myLocation)=>{
+  if(myLocation ==="") return;
+  documents.sort((a, b)=>{
+    console.log(myLocation.latitude , a.latitude)
+    const dLatitudeA = myLocation.latitude - a.latitude;
+    const dLongitudeA = myLocation.longitude - a.longitude;
+    const euclideanA = Math.sqrt(Math.pow(dLatitudeA, 2) + Math.pow(dLongitudeA, 2));
+
+    const dLatitudeB = myLocation.latitude - b.latitude;
+    const dLongitudeB = myLocation.longitude - b.longitude;
+    const euclideanB = Math.sqrt(Math.pow(dLatitudeB, 2) + Math.pow(dLongitudeB, 2));
+    return euclideanA - euclideanB;
+  })
+}
+
+module.exports.filteredCafe = async(req, res)=>{
+  const filter = req.query.filter;
+  const searchTerm = filter.filterInput;
+  const filter1 = filter.filter1;
+  const filter2 = filter.filter2;
+  const userLocation = filter.userLocation;
+//구현하기 purpose구해서 해당하는 것만 취하기 map에서 return true or false로
+
+
+  // const cafes = await Cafe.find({
+  //   $and:[
+  //     {
+  //       $or:[
+  //         {name:{ $regex : searchTerm, $options:'i'}},
+  //         {"menu.name":{ $regex : searchTerm, $options:'i'}},
+  //         {"repreMenu.name":{ $regex : searchTerm, $options:'i'}}
+  //       ]
+  //     },
+  //     {totalPurpose:{$regex:"filter1"}}
+  //   ]
+  // }).sort({score:{$meta : 'textScore'}}).select({ score: { $meta: 'textScore' } })
+
+
+
+  // console.log("after filter 1 2", cafes);
+  // switch(filter2){
+  //   case "highStar":
+  //     sortByRatingDec(cafes);
+  //     break;
+  //   case "lowStar":
+  //     sortByRatingAsc(cafes);
+  //     break;
+  //   case "highReview":
+  //     sortByReviewHigh(cafes);
+  //     break;
+  //   case "lowReview":
+  //     sortByReviewLow(cafes);
+  //     break;
+  //   case "closeToMe":
+  //     sortByCloseLocationAsc(cafes, JSON.parse(userLocation));
+  //     break;
+  // }
+  // console.log("after filter 3", cafes);
+
+
+  res.send(cafes);
 }

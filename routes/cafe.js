@@ -32,6 +32,9 @@ router.route('/user/review/:id')
 
 router.route('/edit/:id')
     .get(cafes.editCafePage)
-    .post(cafes.editCafe);    
+    .post(cafes.editCafe);
+
+router.route('/filter')
+    .get(cafes.filteredCafe)
     
 module.exports = router;

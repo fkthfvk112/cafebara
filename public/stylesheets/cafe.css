@@ -31,14 +31,15 @@
   }
 
   .filterContainer{
-    display: inline-block;
+    text-align: center;
+    display: flex;
+    max-width: 600px;
+    width:80%;
     background-color: white;
     border: 1px solid black;
     padding: 5px 0px 5px 10px;
     border-radius: 70px 70px 70px 70px;
-
   }
-
   .filterSection select{
     height: 50px;
     border:none;
@@ -92,4 +93,41 @@
     margin: 5px;
     font-size: 20px;
     font-weight: 800;
+  }
+
+  @media (max-width:760px){
+
+    .filterContainer{
+      display:flex !important;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      border-radius: 0;
+      border: none;
+    }
+    .filterBtn{
+      max-width: 300px;
+      width:80% !important;
+    }
+
+    .filterContainer > input{
+      width: 80% !important;
+      margin: 0;
+      border-radius: 10px 10px 10px 10px;
+    }
+    .filterContainer select{
+      border:none;
+      width:15em;
+
+    }
+    .selectContainer{
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .filterText2To4{
+      display: block;
+    }
   }
