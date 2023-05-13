@@ -33,6 +33,7 @@
   .filterContainer{
     text-align: center;
     display: flex;
+    align-items: center;
     max-width: 600px;
     width:80%;
     background-color: white;
@@ -56,7 +57,7 @@
   }
   .filterSection button{
     position: relative;
-    left:-2px;
+    left:0.3em;
     border: none;
     color: white;
     background-color: #2b2d42;
@@ -66,29 +67,22 @@
   }
 
   .filterText1{
+    position:relative;
+    top:-0.3em;
     font-size: 40px;
     font-weight: 800;
     margin: 10px;
     font-weight: 800;
   }
   .filterText2{
-    position:relative;
-    top:-13px;
-    margin: 5px;
-    font-size: 20px;
-    font-weight: 800;
-  }
-  .filterText3{
-    position:relative;
-    top:-13px;
     margin: 5px;
     font-size: 20px;
     font-weight: 800;
   }
 
-  .filterText4{
+  .filterText3{
     position:relative;
-    left:-133px;
+    left:-130px;
     top:8px;
     margin: 5px;
     font-size: 20px;
@@ -114,6 +108,7 @@
       width: 80% !important;
       margin: 0;
       border-radius: 10px 10px 10px 10px;
+      border: 1px solid #2b2d42;
     }
     .filterContainer select{
       border:none;
@@ -128,6 +123,28 @@
     }
 
     .filterText2To4{
-      display: block;
+      display: flex;
+      padding-left: 4em;
+    }
+    .filterText1{
+      top:0;
+      margin-bottom: 0px;
+    }
+    .filterText2{
+      text-align: left;
+      margin:0px;
     }
   }
+
+.cafeContainer{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.cardWrapper{
+  display: inline-block;
+  min-width:13em;
+  max-width:20em;
+  margin:1em;
+}

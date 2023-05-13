@@ -4,10 +4,14 @@ const {storage} = require('../cloudinary');
 const {cloudinary} = require('../cloudinary')
 const mongoose = require('mongoose');
 
-const ObjectId = mongoose.Types.ObjectId;
-
 module.exports.showCafes = async(req, res)=>{
-    const cafes = await Cafe.find({});
+    let cafes = await Cafe.find({});
+    cafes.forEach((cafe)=>{
+      const ratingAVGtotal = cafe.ratingAVGtotal;
+      const purposeTotal = cafe.purposeTotal;
+      cafe.avgTotal = ratingAVGtotal;
+      cafe.purposeTotal = purposeTotal;
+    })
     res.render('cafe', {cafes});
 };
 
@@ -275,7 +279,6 @@ module.exports.editCafe = async(req, res, next)=>{//have to edit
     /*menu update*/
     let preMenuLength = preCafe.menu.length;
     if(menu.length !== 0){
-        console.log("이거")
         for(let i = 0; i < menu.length; i++){
           const nameKey = `menu.${i}.name`;
           const priceKey = `menu.${i}.price`;
@@ -308,6 +311,37 @@ module.exports.editCafe = async(req, res, next)=>{//have to edit
     return next(err);
   }
   res.redirect('/cafe');
+}
+//'study', 'talk', 'takeOut', 'nofeatures'] have to eidt
+const filterAtmos = (documents, atmos)=>{
+  if(atmos==="") return documents;
+  const newCafeArr = documents.filter((cafe)=>{
+    if(cafe.purposeTotal === atmos) return true;
+    else return false;
+  })
+
+  return newCafeArr;
+  /* version 1 below without virtual field*/
+  // const newCafeArr = documents.filter((cafe)=>{
+  //   let atmosCnt = {
+  //     study:0,
+  //     talk:0,
+  //     takeOut:0,
+  //     cntNofeatures:0
+  //   }
+  //   const comment = cafe.comment;
+  //   for(let i = 0; i < comment.length; i++){
+  //       if(comment[i].purpose ==="study") atmosCnt.study++;
+  //       else if(comment[i].purpose ==="talk") atmosCnt.talk++;
+  //       else if(comment[i].purpose ==="takeOut") atmosCnt.takeOut++;
+  //       else atmosCnt.cntNofeatures++;
+  //   }
+  //   if(Math.max(atmosCnt.study, atmosCnt.talk, atmosCnt.takeOut, atmosCnt.cntNofeatures)===atmosCnt[atmos]){
+  //     return true;
+  //   }
+  //   return false;
+  // })
+  // return newCafeArr;
 }
 
 const sortByRatingDec = (documents)=>{
@@ -350,41 +384,40 @@ module.exports.filteredCafe = async(req, res)=>{
 //구현하기 purpose구해서 해당하는 것만 취하기 map에서 return true or false로
 
 
-  // const cafes = await Cafe.find({
-  //   $and:[
-  //     {
-  //       $or:[
-  //         {name:{ $regex : searchTerm, $options:'i'}},
-  //         {"menu.name":{ $regex : searchTerm, $options:'i'}},
-  //         {"repreMenu.name":{ $regex : searchTerm, $options:'i'}}
-  //       ]
-  //     },
-  //     {totalPurpose:{$regex:"filter1"}}
-  //   ]
-  // }).sort({score:{$meta : 'textScore'}}).select({ score: { $meta: 'textScore' } })
+  let cafes = await Cafe.find({
+    $or:[
+      {name:{ $regex : searchTerm, $options:'i'}},
+      {"menu.name":{ $regex : searchTerm, $options:'i'}},
+      {"repreMenu.name":{ $regex : searchTerm, $options:'i'}}
+    ]
+  }).sort({score:{$meta : 'textScore'}}).select({ score: { $meta: 'textScore' } })
+
+  cafes.forEach((cafe)=>{
+    const ratingAVGtotal = cafe.ratingAVGtotal;
+    const purposeTotal = cafe.purposeTotal;
+    cafe.avgTotal = ratingAVGtotal;
+    cafe.purposeTotal = purposeTotal;
+  })
+
+  cafes = filterAtmos(cafes, filter1);
+  switch(filter2){
+    case "highStar":
+      sortByRatingDec(cafes);
+      break;
+    case "lowStar":
+      sortByRatingAsc(cafes);
+      break;
+    case "highReview":
+      sortByReviewHigh(cafes);
+      break;
+    case "lowReview":
+      sortByReviewLow(cafes);
+      break;
+    case "closeToMe":
+      sortByCloseLocationAsc(cafes, JSON.parse(userLocation));
+      break;
+  }
 
 
-
-  // console.log("after filter 1 2", cafes);
-  // switch(filter2){
-  //   case "highStar":
-  //     sortByRatingDec(cafes);
-  //     break;
-  //   case "lowStar":
-  //     sortByRatingAsc(cafes);
-  //     break;
-  //   case "highReview":
-  //     sortByReviewHigh(cafes);
-  //     break;
-  //   case "lowReview":
-  //     sortByReviewLow(cafes);
-  //     break;
-  //   case "closeToMe":
-  //     sortByCloseLocationAsc(cafes, JSON.parse(userLocation));
-  //     break;
-  // }
-  // console.log("after filter 3", cafes);
-
-
-  res.send(cafes);
+  res.render('cafe', {cafes});
 }

@@ -39,7 +39,6 @@ const cafeSchema = new Schema({
       price:Number
     }
   ],
-  takeOut:Boolean,
   location: {
     type:String,
     required:true
@@ -122,6 +121,26 @@ const cafeSchema = new Schema({
 //   doc.markModified(doc.totalPurpose)
 //   next();
 // })
+cafeSchema.virtual('purposeTotal').get(function(){
+  const comments = this.comment||[];
+  let cntStudy = 0;
+  let cntTalk = 0;
+  let cntTakeOut = 0;
+  let cntNofeatures = 0;
+  comments.forEach((comment)=>{
+    if(comment.purpose ==="study") cntStudy++;
+    else if(comment.purpose ==="talk") cntTalk++;
+    else if(comment.purpose ==="takeOut") cntTakeOut++;
+    else cntNofeatures++;
+  })
+  console.log(this.name, cntStudy, cntTalk, cntTakeOut, cntNofeatures);
+  let maxValue = Math.max(cntStudy, cntTalk, cntTakeOut, cntNofeatures);
+  if(maxValue === 0) return "nofeatures";
+  if(maxValue === cntStudy) return "study";
+  else if(maxValue === cntTalk) return "talk";
+  else if(maxValue === cntTakeOut) return "takeOut";
+  else return "nofeatures";
+})
 
 cafeSchema.virtual('ratingAVG').get(function(){
   const comments = this.comment || [];
@@ -134,14 +153,13 @@ cafeSchema.virtual('ratingAVG').get(function(){
     price: ratings.reduce((total, rating) => total + rating.price, 0)
   };
 
+  console.log()
   return {
     taste: numComments ? sum.taste / numComments : 0,
     atmosphere: numComments ? sum.atmosphere / numComments : 0,
     price: numComments ? sum.price / numComments : 0
   };
 });
-
-
 
 cafeSchema.virtual('ratingAVGtotal').get(function(){
   const comments = this.comment || [];
@@ -172,3 +190,6 @@ cafeSchema.virtual('reviewCnt').get(function(){
 
 
 module.exports = mongoose.model('Cafe', cafeSchema);//모델에 접근
+
+
+

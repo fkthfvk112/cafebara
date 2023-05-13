@@ -1,8 +1,5 @@
       /* 메인 내용을 감싸고 있는 div를 가리키는 클래스 */
-      
-      body{
-        background-color: #f1f1f1;
-      }
+
       .main {
         margin-left: 160px; /* 사이드바 너비 만큼 왼쪽으로 이동 */
       }
@@ -45,6 +42,8 @@
           background-color: #212529;
           padding-top: 10px;
           padding-bottom: 10px;
+          text-align: center;
+          font-size:0.2em;
         }
         
         .sidebar a {
@@ -64,7 +63,7 @@
 .userInfoContainer{
   box-shadow: 0 2px 4px rgba(0,0,0,0.5); 
   min-width: 250px;
-  max-height: 200px;
+  max-height: 300px;
   background-color:white;
   margin: 15px;
 }
