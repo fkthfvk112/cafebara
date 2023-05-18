@@ -14,7 +14,9 @@
                         <div style="border-bottom: 2px solid #adb5bd; font-weight: bold; padding-left:0.5em;" ><%=allUserInfo.email%></div>
                         <div class="text-center">
                             <div class="changeOrDelete mt-3">비밀번호 변경</div>
-                            <div class="changeOrDelete">회원 탈퇴</div>
+                            <div id='deleteId' class="changeOrDelete" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                회원 탈퇴
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -34,14 +36,15 @@
             </div>
         </div>
         <hr>
-        <div id="likeCafe" style="margin-bottom: 100px;">
+        
+        <div style="margin-bottom: 100px;">
             <h1  style="margin-left:100px; margin-top:100px; margin-bottom:50px">내 찜 목록</h1>
-            <div class="d-flex justify-content-center">
+            <div class="d-flex flex-column justify-content-center">
                 <div class="row userInfoContainer3">
-                    <h4>찜한 카페</h4>
+                    <h4 id="likeCafe">찜한 카페</h4>
                     <% for(let likeCafe of allUserInfo.likes){ %>
                         <a href="/cafe/<%=likeCafe._id%>" style="text-decoration:none; color:black;">
-                            <div class="likeCafeContainer">
+                            <div class="likeCafeContainer mt-3">
                                 <div class="d-flex justify-content-between">
                                     <span class="ms-1"><%=likeCafe.name%></span>
                                     <button class="me-3">❤</button><!--have to 눌러서 찜 삭제 axios-->
@@ -51,7 +54,59 @@
                         </a>
                     <% }%>
                 </div>
+                <div class="row userInfoContainer3" style="margin-top: 8em;">
+                    <h4 id="createdCafe">내가 생성한 카페</h4>
+                    <% for(let creadtedCafe of allUserInfo.creadtedCafe){ %>
+                        <a href="/cafe/<%=creadtedCafe._id%>" style="text-decoration:none; color:black;">
+                            <div class="likeCafeContainer mt-3">
+                                <div class="d-flex justify-content-between">
+                                    <span class="ms-1"><%=creadtedCafe.name%></span>
+                                </div>
+                                <p><%=creadtedCafe.description%></p>
+                            </div>
+                        </a>
+                    <% }%>
+                </div>
             </div>
         </div>
     </div>
 </div>
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">회원 탈퇴</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+            <div class="modal-body text-center">
+            잘 가요 <%=allUserInfo.nickName%> 님, 그리울 거에요.
+        </div>
+        <div class="modal-footer">
+        <div class="text-center me-3">정말로 회원을 탈퇴하시겠습니까?</div>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+          <button type="button" id="finalDeleteBtn" class="btn btn-primary">회원 삭제</button>
+        </div>
+      </div>
+    </div>
+  </div>
+<script>
+    const validatePasswordInput = document.querySelector('#validatePasswordInput');
+    const finalDeleteBtn = document.querySelector('#finalDeleteBtn');
+
+    finalDeleteBtn.addEventListener('click', async()=>{
+        await axios.post('/user/deleteId', {delete:true})
+            .then(res=>{
+                console.log(res);
+                alert("회원 탈퇴 완료");
+                window.history.replaceState(null, '', '/');
+                window.location.href = '/';
+
+            })
+            .catch(res=>{
+                console.log(res);
+                alert("회원 탈퇴 실패!")
+            })
+    });
+
+</script>

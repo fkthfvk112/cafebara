@@ -7,7 +7,8 @@ import { useParams } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import {StarRating} from './starRating';
 import { KakaoMap } from './kakaoMap';
-import {FirstPageCarousel} from './FirstPageCarousel'
+import {FirstPageCarousel} from './FirstPageCarousel';
+import {KakaoShareBtn} from './kakaoShareBtn'; 
 import React, { useState, useEffect } from 'react';
 const grayColor = '#edede9';
 axios.defaults.withCredentials = true;
@@ -15,6 +16,8 @@ axios.defaults.withCredentials = true;
 function PageOne(probs){
   const [ratings, setRatings] = useState();
   const [heart, setHeart] = useState(0);
+  const [copyMessage, setCopyMessage] = useState(false);
+
   const handleAtmos = ()=>{
     let cntStudy = 0;
     let cntTalk = 0;
@@ -93,7 +96,22 @@ function PageOne(probs){
           console.log(e);
         }
     }
-  
+
+  const handleCopyBtn = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopyMessage(true);
+    
+    if (setCopyMessage){
+      setTimeout(()=>{
+        setCopyMessage(false);
+      }, 1500);
+    }
+  }
+
+  const handleKakaoShare = ()=>{
+    window.Kakao.Share.createDefaultButton();
+    console.log(window.Kakao.Share);
+  }  
   
   const images = probs.cafeData?probs.cafeData.images:[{url:''}];
   return(
@@ -118,7 +136,7 @@ function PageOne(probs){
         <div className="offset-1 col-7">
           <div className="row">{/*댓글*/}
             <div className='text-end'>
-              <button onClick={handleHeartBtn} className ={`mt-3 heartBtn`}>
+              <button onClick={handleHeartBtn} className ={`mb-3 heartBtn`}>
                 {heart===1?"❤":"🤍"} Like
               </button>
             </div>
@@ -126,7 +144,13 @@ function PageOne(probs){
           </div>
         </div>
       </div>
-      <div className='row pt-3 pb-3 text-center' style={{borderTop:`2px solid ${grayColor}`}}>{/*3번항목*/}
+
+      <div className='pt-3 pb-3 text-center' style={{borderTop:`2px solid ${grayColor}`}}>{/*3번항목*/}
+          <button className='shareBtn sharBtnA' onClick={handleCopyBtn}>📥</button>
+          <KakaoShareBtn/>
+          <div className="d-flex justify-content-center">
+            {copyMessage?<div className='copyMessage'> URL 복사 완료!</div>:<div className='copyMessageEmpty'>&nbsp;</div>}
+          </div>
       </div>
     </div>
   )
@@ -635,9 +659,10 @@ function SetPage(probs) {
         </Routes>
         {editButton}
         {deleteButton}
-        <span>
+        <details style={{marginBottom:'5em'}}>
+          <summary>지도 보기</summary>
           <KakaoMap latitude={cafeData&&cafeData.latitude} longitude={cafeData&&cafeData.longitude}></KakaoMap>
-        </span>
+        </details>
       </BrowserRouter>
       </div>
     </div>

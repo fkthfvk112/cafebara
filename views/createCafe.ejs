@@ -13,7 +13,7 @@
     <!--수정 api값 숨기기-->
     <% layout('layouts/boilerplate') %>
 
-    <div class="container mb-3">
+    <div class="container mb-3" style="margin-top: 10em;">
         <div class="row justify-content-md-center text-center">
             <h1 class="my-3"> 카페 생성 페이지</h1>
             <div class="card" style="width: 30rem;">
@@ -252,20 +252,20 @@
     const markers = [];
 
     let clusterer = new kakao.maps.MarkerClusterer({
-    map: map,
-    markers: markers,
-    gridSize: 35,
-    averageCenter: true,
-    minLevel: 6,
-    disableClickZoom: true,
-    styles: [{
-        width : '53px', height : '52px',
-        background: 'url(cluster.png) no-repeat',
-        color: '#fff',
-        textAlign: 'center',
-        lineHeight: '54px'
-    }]
-});
+        map: map,
+        markers: markers,
+        gridSize: 35,
+        averageCenter: true,
+        minLevel: 6,
+        disableClickZoom: true,
+        styles: [{
+            width : '53px', height : '52px',
+            background: 'url(cluster.png) no-repeat',
+            color: '#fff',
+            textAlign: 'center',
+            lineHeight: '54px'
+        }]
+    });
 
     /* location / map처리 */
     let locationTags = [];

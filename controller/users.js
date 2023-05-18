@@ -71,8 +71,6 @@ module.exports.isLogInAPI = async(req, res)=>{
       };
 
 module.exports.likeCafe = async(req, res)=>{ //로그인하지 않앗을때 처리 잘 되나?
-  
-
     let heartToggle = 0;
 
     const userID = req.user&&req.user._id;
@@ -124,14 +122,64 @@ module.exports.likeCafe = async(req, res)=>{ //로그인하지 않앗을때 처�
     likeCafeArr.push(cafe);
   })
 
+  const creadtedCafe = await Cafe.find({author:userID});
+
     const allUserInfo = {
       nickName:user.nickName,
       email:user.email,
       comments:commentArr,
-      likes:likeCafeArr
+      likes:likeCafeArr,
+      creadtedCafe:creadtedCafe
     }
-
-    console.log("올 아이템, ", allUserInfo);
-
+  
+    console.log('유저', allUserInfo);
   res.render('user', {allUserInfo});//클라이언트측 진행
+}
+
+module.exports.isValideId = async (req, res, next) =>{
+  inputedUser = req.body.user;
+  const userData = await User.find({username:inputedUser});
+  let checkId;
+  if(userData.length >=1){
+    checkId = userData[0].username;
+  }
+
+  if(!checkId){
+    res.send(true);
+  }
+  else{
+    res.send(false);
+  }
+  next();
+}
+
+module.exports.isValideNickname = async (req, res, next) =>{
+  inputedUser = req.body.user;
+  const userData = await User.find({nickName:inputedUser});
+  let checkNickName;
+  if(userData.length >=1){
+    checkNickName = userData[0].nickName;
+  }
+
+  console.log(!checkNickName);
+
+  if(!checkNickName){
+    res.send(true);
+  }
+  else{
+    res.send(false);
+  }
+  next();
+}
+
+module.exports.deleteId = async(req, res)=>{
+  const userID = req.user&&req.user._id;
+  await User.findOneAndDelete(userID)
+  await Cafe.deleteMany({author:userID});
+  await Cafe.updateMany(
+    {"comment.user":userID},
+    {$pull:{comment:{user:userID}}}
+  )
+
+  res.send("deleteOk");
 }

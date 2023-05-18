@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
+
 export function KakaoMap(probs) {
+
     useEffect(()=>{
         const script = document.createElement('script');
         script.async = true;
@@ -14,7 +16,11 @@ export function KakaoMap(probs) {
                             level: 3,
                             draggable: true
                         };
-                        window.kakao.maps.Map(container, options);
+                        let map =new window.kakao.maps.Map(container, options);
+                        let marker = new window.kakao.maps.Marker({
+                            position: new window.kakao.maps.LatLng(probs.latitude, probs.longitude)
+                        });                        
+                        marker.setMap(map)
                     });
                 });
     }, [probs.latitude, probs.longitude])

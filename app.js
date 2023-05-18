@@ -26,6 +26,7 @@ const cookieParser = require('cookie-parser');
 
 const cafeRoutes = require('./routes/cafe');
 const userRoutes = require('./routes/user');
+const { createProxyMiddleware } = require('http-proxy-middleware');//react cors처리
 
 mongoose.set('strictQuery', false);
 mongoose.connect("mongodb://127.0.0.1:27017/Cafe")
@@ -47,6 +48,7 @@ app.use(express.static(__dirname + '/public'));
 app.use(express.static(__dirname + '/public/client-react/build'));
 
 
+//origin: '*',
 app.use(cors({
   origin: 'http://localhost:3000',
   credentials: true
@@ -77,11 +79,13 @@ app.use(cookieParser('keyboard cat'));
 
 app.use(flash());
 
+
+
 app.use('/cafe', cafeRoutes)
 app.use('/user', userRoutes)
 
 
-app.get('/', (req, res)=>{
+app.get('/home', (req, res)=>{
     res.render('home')
 });
 
@@ -119,7 +123,9 @@ app.get('/cafe/:id', (req, res)=>{
   res.sendFile('/public/client-react/build/index.html', {root:'.'})
 })
 
-
+app.get('/temp', (req, res)=>{
+  res.render('temp');
+})
 // app.get('/cafe/:id', (req, res)=>{
 //   res.render(__dirname + '/buld/index.ejs')
 // })

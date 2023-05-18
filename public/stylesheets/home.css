@@ -1,0 +1,107 @@
+
+.showCafeImg{
+    width: 40em;
+}
+
+.showCafeImg2{
+    width: 45em;
+}
+
+.showCafeImg3{
+    width: 30em;
+}
+
+.goCafe{
+    text-decoration: none;
+    color:#eb5e28;
+    font-weight: 700;
+}
+
+section{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    flex-direction: column;
+    align-items: center;
+}
+#logoText div{
+    font-weight: bold;
+    font-size: 1.3em;
+    margin-bottom: 0.5em;
+}
+section h3{
+    font-weight: bold;
+}
+section h1{
+    font-weight: bold;
+}
+#logoSection{
+    margin-top: 10em;
+    display: flex;
+    flex-wrap: wrap;
+    margin-right:4em;
+    margin-left:4em;
+}
+
+#logoText{
+    width:23em;
+}
+
+p{
+    font-size:1em;
+    margin-left: 3em;
+    text-align: start;
+}
+
+#categoryName{
+    display: flex;
+    align-items: flex-start;
+    min-width: 100px;
+    margin-bottom:1em;
+}
+
+.box{
+    position: relative;
+    z-index: -1;
+    top:-0.9em;
+    left:2.2em;
+    background-color: #f4a261;
+    display: block;
+    margin-top: 0.6em;
+    margin-right: 1em;
+    width: 2em;
+    height: 2em;
+}
+
+.circle{
+    position: relative;
+    border-radius:100%;
+    z-index: -1;
+    top:-1em;
+    left:2.2em;
+    background-color: gold;
+    display: block;
+    margin-top: 0.6em;
+    margin-right: 1em;
+    width: 2.2em;
+    height: 2.2em;
+}
+
+#logo{
+    position: relative;
+    top:-5em;
+}
+
+.helloText{
+    color:#f4a261;
+    font-weight: bold;
+    font-size: 3.5em;
+}
+
+@media screen and (max-width: 845px) {
+    #logo{
+        position: relative;
+        top:0;
+    }
+}
+

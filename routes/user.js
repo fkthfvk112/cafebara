@@ -9,7 +9,13 @@ router.route('/')
 
 router.route('/signup')
     .get(users.sendSignUp)
-    .post(isLoggedIn, users.signUp)
+    .post(users.signUp)
+
+router.route('/signup/idValidationCheck')
+    .post(users.isValideId)
+
+router.route('/signup/isValideNickname')
+    .post(users.isValideNickname);
 
 router.route('/signin')
     .get(users.sendSignIn)
@@ -24,6 +30,9 @@ router.route('/logout')
 
 router.route('/api/islogIn')
     .get(users.isLogInAPI)
+
+router.route('/deleteId')
+    .post(isLoggedIn, users.deleteId)
 
 router.route('/like/:id')
     .get(users.likeCafe)

@@ -13,34 +13,38 @@
     <div class="container" style="margin-top: 6em; margin-bottom: 6em;">
         <div class="row justify-content-md-center text-center">
             <div class="card" style="width: 25rem;">
-                <form class="needs-validation" id="signUpForm" action="/user/signup" method="POST" novalidate>
+                <form  id="signUpForm" action="/user/signup" method="POST">
                 <div class="card-body">
-
                 <h5 class="card-title">회원가입</h5>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item row">
-                        <label for="nickName">아이디</label>
-                        <input class="form-control" id="nickName" type="text" name="user[username]" required>
+                        <label for="userID">아이디</label>
+                        <input class="form-control" id="userID" type="text" name="user[username]" minlength="5" required>
+                        <div>&nbsp</div>
                     </li>
                     <li class="list-group-item row">
                         <label for="nickName">닉네임</label>
-                        <input class="form-control" id="nickName" type="text" name="user[nickName]" required>
+                        <input class="form-control" id="nickName" type="text" name="user[nickName]" minlength="3" required>
+                        <div>&nbsp</div>
                     </li>
                     <li class="list-group-item row">
                         <label for="email">이메일</label>
                         <input class="form-control" id="email" type="text" name="user[email]" required>
+                        <div>&nbsp</div>
                     </li>
                     <li class="list-group-item row">
                         <label for="password">비밀번호</label>
-                        <input class="form-control"  id="password" type="password" name="user[password]" required>
+                        <input class="form-control"  id="password" type="password" name="user[password]" minlength="8" required>
+                        <div>&nbsp</div>
                     </li>
                     <li class="list-group-item row">
                         <label for="passwordRecomfirm" >비밀번호 확인</label>
-                        <input class="form-control"  id="passwordRecomfirm" type="password" value="" required>
+                        <input class="form-control"  id="passwordRecomfirm" type="password" value="" minlength="8" required>
+                        <div>&nbsp</div>
                     </li>
                 </ul>
                 <div class="card-body">
-                    <button class="btn btn-primary btn-sm" id="okBtn"  type="submit">가입하기</button>
+                    <button id="okBtn" type="button">가입하기</button>
                 </div>
                 </form>
             </div>
@@ -49,38 +53,89 @@
 
 </body>
 </html>
-<script>
-    function checkPW(){
-        const signUpForm = document.querySelector('#signUpForm');
-        const reconfirmPassword = document.querySelector('#passwordRecomfirm');
-        const password = document.querySelector('#password');
-        const okBtn = document.querySelector('#okBtn');
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-        const isValidPassword = (reconfirmPassword.value === password.value);
-        if(!isValidPassword){
-            event.preventDefault()
-            event.stopPropagation()
-            alert('비밀번호가 일치하지 않습니다.');
-        }       
+<script>
+    const userID = document.querySelector("#userID");
+    const nickName = document.querySelector("#nickName");
+    const password = document.querySelector("#password");
+    const passwordRecomfirm = document.querySelector("#passwordRecomfirm");
+    const okBtn = document.querySelector("#okBtn");
+    const signUpForm = document.querySelector("#signUpForm");
+
+    const checkRestriction = (eleNode, number)=>{
+        if(eleNode.value.length >= number){
+            console.log(eleNode.value)
+            return true;
+        }
+        else return false;
+    }
+    const setMessageToNextSibling = (eleNode, message)=>{
+        const sibling = eleNode.nextElementSibling;
+        sibling.innerHTML = message;
+        sibling.setAttribute('style', 'color:red;')
+        setTimeout(()=>{
+            eleNode.nextElementSibling.innerHTML = "&nbsp";
+        }, 5000);
     }
 
-    (() => {
-    'use strict'
-  
-    // Fetch all the forms we want to apply custom Bootstrap validation styles to
-    const forms = document.querySelectorAll('.needs-validation')
-  
-    // Loop over them and prevent submission
-    Array.from(forms).forEach(form => {
-      form.addEventListener('submit', event => {
-        if (!form.checkValidity()) {
-          event.preventDefault()
-          event.stopPropagation()
+    userID.addEventListener('blur', async()=>{
+        if(!checkRestriction(userID, 5)){
+            setMessageToNextSibling(userID, "유저 아이디는 5글자 이상이어야합니다.");
         }
-        else checkPW();
-  
-        form.classList.add('was-validated')
-      }, false)
+        else{
+            const res = await axios.post('/user/signup/idValidationCheck', {user:userID.value})
+            console.log(res);
+            if(!res.data){
+                setMessageToNextSibling(userID, "이미 존재하는 아이디입니다.");
+            }
+        }
+
     })
-  })()
+    nickName.addEventListener('blur', async()=>{
+        if(!checkRestriction(nickName, 3)){
+            setMessageToNextSibling(nickName, "별명은 3글자 이상이어야합니다.")
+        }
+        else{
+            const res = await axios.post('/user/signup/isValideNickname', {user:nickName.value})
+            console.log(res);
+            if(!res.data){
+                setMessageToNextSibling(nickName, "이미 존재하는 닉네임입니다.");
+            }
+        }
+    })
+    password.addEventListener('blur', ()=>{
+        if(!checkRestriction(password, 8)){
+            setMessageToNextSibling(password, "비밀번호는 8글자 이상이어야합니다.")
+        }      
+    })
+    passwordRecomfirm.addEventListener('blur', ()=>{
+        if(password.value !== passwordRecomfirm.value){
+            setMessageToNextSibling(passwordRecomfirm, "비밀번호가 일치하지 않습니다.")
+        }
+    })
+
+    okBtn.addEventListener('click', async(e)=>{
+        e.preventDefault();
+        const con1 = checkRestriction(userID, 5)
+        const con2 = checkRestriction(nickName, 3)
+        const con3 = checkRestriction(password, 10)
+        const con4 = password.value === passwordRecomfirm.value;
+        const resID = await axios.post('/user/signup/idValidationCheck', {user:userID.value})
+        const con5 = resID.data;
+        const resNickname = await axios.post('/user/signup/isValideNickname', {user:nickName.value})
+        const con6 = resNickname.data;
+
+        if(con1&&con2&&con3&&con4&&con5&&con6){
+            signUpForm.submit();
+        }else{
+            if(!con1)setMessageToNextSibling(userID, "유저 아이디는 5글자 이상이어야합니다.")
+            if(!con2)setMessageToNextSibling(nickName, "별명은 3글자 이상이어야합니다.")
+            if(!con3)setMessageToNextSibling(password, "비밀번호는 8글자 이상이어야합니다.")
+            if(!con4)setMessageToNextSibling(passwordRecomfirm, "비밀번호가 일치하지 않습니다.")
+            if(!con5)setMessageToNextSibling(userID, "이미 존재하는 아이디입니다.");
+            if(!con6)setMessageToNextSibling(nickName, "이미 존재하는 닉네임입니다.");
+        }
+    })
+
 </script>

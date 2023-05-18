@@ -134,7 +134,6 @@ module.exports.createReview = async(req, res) => {
     const priceRate = req.body.priceRate;
     let atmos;
 
-    console.log("보디", req.body);
 
     if(req.body.study === 'true'){
       atmos = 'study';
@@ -202,7 +201,6 @@ module.exports.deleteCafe = async (req, res)=>{
 module.exports.editCafePage = async(req, res)=>{
   const id = req.params.id;
   const cafe = await Cafe.findById(id);
-  console.log(cafe);
 
   res.render('editCafe', {cafe});
 }
@@ -214,7 +212,6 @@ module.exports.editCafe = async(req, res, next)=>{//have to edit
     const menuData = req.body.menu;
     const authorID = req.user&&req.user._id;
 
-    console.log("메뉴 데이터", menuData);
     let menu;
     if(Array.isArray(menuData&&menuData.name)){//2개 이상(배열)
       menu = menuData && menuData.name.map((name, idx)=>({
@@ -251,6 +248,7 @@ module.exports.editCafe = async(req, res, next)=>{//have to edit
     //const cafeImages = req.files&&req.files.photos.map(f =>({url:f.path, filename:f.filename}));
     const preCafe = await Cafe.findById(req.params.id);
     const postCafe = req.body.cafe;
+    
 
     // console.log("이전", preCafe);
     // console.log("이후", postCafe);
@@ -363,7 +361,6 @@ const sortByReviewLow = (documents)=>{
 const sortByCloseLocationAsc = (documents, myLocation)=>{
   if(myLocation ==="") return;
   documents.sort((a, b)=>{
-    console.log(myLocation.latitude , a.latitude)
     const dLatitudeA = myLocation.latitude - a.latitude;
     const dLongitudeA = myLocation.longitude - a.longitude;
     const euclideanA = Math.sqrt(Math.pow(dLatitudeA, 2) + Math.pow(dLongitudeA, 2));
