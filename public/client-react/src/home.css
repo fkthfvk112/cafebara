@@ -1,0 +1,130 @@
+
+.showCafeImg{
+    width: 70%;
+    max-width: 35em;
+}
+
+.showCafeImg2{
+    width: 60%;
+    max-width: 40em;
+
+}
+
+.showCafeImg3{
+    width: 60%;
+    max-width: 30em;
+}
+
+.goCafe{
+    text-decoration: none;
+    color:#eb5e28;
+    font-weight: 700;
+    font-size: 0.8em;
+}
+
+.goCafe > img{
+    opacity: 0;
+    width:1.5em;
+    transition: opacity 0.2s ease;
+}
+
+.goCafe:hover{
+    font-size: 0.9em;
+    color:red;
+}
+
+.goCafe:hover > img{
+    opacity: 1000;
+    width:2em; 
+}
+
+section{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    flex-direction: column;
+    align-items: center;
+}
+#logoText div{
+    font-weight: bold;
+    font-size: 1.3em;
+    margin-bottom: 0.5em;
+}
+section h3{
+    font-weight: bold;
+}
+section h1{
+    font-weight: bold;
+}
+#logoSection{
+    margin-top: 8em;
+    display: flex;
+    flex-wrap: wrap;
+    margin-right:4em;
+    margin-left:4em;
+}
+
+#logoText{
+    width:23em;
+}
+
+p{
+    font-size:1em;
+    margin-left: 3em;
+    text-align: start;
+}
+
+#categoryName{
+    position: relative;
+    z-index: 0;
+    display: flex;
+    align-items: flex-start;
+    min-width: 100px;
+    margin-bottom:1em;
+}
+
+.box{
+    position: relative;
+    z-index: -1;
+    top:-0.9em;
+    left:2.2em;
+    background-color: #f4a261;
+    display: block;
+    margin-top: 0.6em;
+    margin-right: 1em;
+    width: 2em;
+    height: 2em;
+}
+
+.circle{
+    position: relative;
+    border-radius:100%;
+    z-index: -1;
+    top:-1em;
+    left:2.2em;
+    background-color: gold;
+    display: block;
+    margin-top: 0.6em;
+    margin-right: 1em;
+    width: 2.2em;
+    height: 2.2em;
+}
+
+#logo{
+    position: relative;
+    top:-5em;
+}
+
+.helloText{
+    color:#f4a261;
+    font-weight: bold;
+    font-size: 3.5em;
+}
+
+@media screen and (max-width: 845px) {
+    #logo{
+        position: relative;
+        top:0;
+    }
+}
+

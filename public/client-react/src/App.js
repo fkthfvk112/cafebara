@@ -2,13 +2,15 @@
 import logo from './logo.svg';
 import './App.css';
 import axios from 'axios';
-import { BrowserRouter, Routes, Route,} from 'react-router-dom';
-import { useParams } from 'react-router-dom';
+//import { BrowserRouter, Routes, Route,} from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
+import {NavBar} from './Navigation';
 import {StarRating} from './starRating';
 import { KakaoMap } from './kakaoMap';
 import {FirstPageCarousel} from './FirstPageCarousel';
 import {KakaoShareBtn} from './kakaoShareBtn'; 
+import {Home} from './Home';
 import React, { useState, useEffect } from 'react';
 const grayColor = '#edede9';
 axios.defaults.withCredentials = true;
@@ -51,7 +53,7 @@ function PageOne(probs){
         const response = await axios.get(`http://localhost:8080/cafe/api/totalRating/${probs.id}`);
         setRatings(response.data);
 
-        const heartToggle = await axios.get(`http://localhost:8080/user/like/${probs.id}`);
+        const heartToggle = await axios.get(`http://localhost:8080/user/checkLike/${probs.id}`);
         setHeart(heartToggle.data);
       }
       catch(e){
@@ -87,10 +89,22 @@ function PageOne(probs){
     return resultText;
   }
 
+
+  const [heartMessage, setHeartMessage] = useState();
   const handleHeartBtn  = async()=>{
+    console.log("하트 ")
         try{
-          const fetchedData = await axios.get(`http://localhost:8080/user/like/${probs.id}`);
-          setHeart(fetchedData.data);
+          if(probs.isLoggedIn){
+            const fetchedData = await axios.get(`http://localhost:8080/user/like/${probs.id}`);
+            setHeart(fetchedData.data);
+            console.log("하트 ", fetchedData.data)
+          }
+          else{
+            setHeartMessage(<div class="hearMessageOn">로그인을 해주세요!</div>)
+            setTimeout(()=>{
+              setHeartMessage()
+            }, 1000)
+          }
         }
         catch(e){
           console.log(e);
@@ -135,10 +149,11 @@ function PageOne(probs){
         </div>
         <div className="offset-1 col-7">
           <div className="row">{/*댓글*/}
-            <div className='text-end'>
+            <div className='text-end' style={{position:'relative'}}>
               <button onClick={handleHeartBtn} className ={`mb-3 heartBtn`}>
                 {heart===1?"❤":"🤍"} Like
               </button>
+              {heartMessage}
             </div>
             <span className='text-start'>{probs.cafeData?probs.cafeData.description:'No'}</span>{/*카페설명*/}
           </div>
@@ -146,7 +161,7 @@ function PageOne(probs){
       </div>
 
       <div className='pt-3 pb-3 text-center' style={{borderTop:`2px solid ${grayColor}`}}>{/*3번항목*/}
-          <button className='shareBtn sharBtnA' onClick={handleCopyBtn}>📥</button>
+          <button className='shareBtn sharBtnA' onClick={handleCopyBtn}>📎</button>
           <KakaoShareBtn/>
           <div className="d-flex justify-content-center">
             {copyMessage?<div className='copyMessage'> URL 복사 완료!</div>:<div className='copyMessageEmpty'>&nbsp;</div>}
@@ -600,7 +615,7 @@ function SetPage(probs) {
   let content = null;
   switch(pageNumber){
     case 0:
-      content = <PageOne user ={probs.user} id={id} setCafeData={setCafeData} cafeData={cafeData}></PageOne>
+      content = <PageOne isLoggedIn={probs.isLoggedIn} user ={probs.user} id={id} setCafeData={setCafeData} cafeData={cafeData}></PageOne>
       break;
     case 1:
       content = <PageTwo isLoggedIn={probs.isLoggedIn} user={probs.user}></PageTwo>
@@ -653,17 +668,13 @@ function SetPage(probs) {
         메뉴
       </button>
       <div className='d-flex justify-content-center container row'>
-      <BrowserRouter>
-        <Routes className="d-flex justify-content-center"> 
-          <Route path="/cafe/:id" element={content}></Route>
-        </Routes>
+        {content}
         {editButton}
         {deleteButton}
         <details style={{marginBottom:'5em'}}>
           <summary>지도 보기</summary>
           <KakaoMap latitude={cafeData&&cafeData.latitude} longitude={cafeData&&cafeData.longitude}></KakaoMap>
         </details>
-      </BrowserRouter>
       </div>
     </div>
   );
@@ -683,11 +694,18 @@ function App() {
   console.log('유저 데이터', userData)
   return (
     <div className="App">
-      <Container className="d-flex justify-content-center" style={{backgroundColor:'white', border:`1px solid ${grayColor}`, marginTop:'10%', minWidth:'350px'}}>
-        <SetPage isLoggedIn={isLoggedIn} user={userData}></SetPage>
+      <NavBar isLoggedIn={isLoggedIn}></NavBar>
+      <Container className="d-flex justify-content-center mb-3" style={{backgroundColor:'white', border:`1px solid ${grayColor}`, marginTop:'10%', minWidth:'350px'}}>
+        <Router className="d-flex justify-content-center"> 
+          <Routes>
+            <Route path="/cafe/:id" element={<SetPage isLoggedIn={isLoggedIn} user={userData} />} />
+            <Route path="/" element={<Home/>} />
+          </Routes>
+        </Router>
       </Container>
     </div>
   );
 }
 
 export default App;
+

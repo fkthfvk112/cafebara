@@ -1,7 +1,8 @@
 const Cafe = require('../models/cafe');
 const User = require('../models/user');
 const mongoose = require('mongoose');
-const { ObjectId } = mongoose.Types;
+const {storage} = require('../cloudinary');
+const {cloudinary} = require('../cloudinary')
 
 
 module.exports.sendSignUp = async(req,res)=>{
@@ -75,23 +76,44 @@ module.exports.likeCafe = async(req, res)=>{ //로그인하지 않앗을때 처�
 
     const userID = req.user&&req.user._id;
     const cafeID = req.params.id;
-
     const user = await User.findById(userID);
     
+    if(userID === undefined){
+      res.send('0');
+    }else{
+      const exist = user&&user.likes.some(cafe => cafe._id.equals(cafeID));
+      console.log(exist);
+      if(exist){
+        await User.updateOne({_id: userID}, {$pull: {likes:cafeID}});
+        heartToggle = 0;
+      }
+      else{
+        await User.updateOne({_id:userID}, {$push:{likes:cafeID}});
+        heartToggle = 1;
+      }
+      const user2 = await User.findById(userID); 
+      console.log("Like Result ", user2);
+  
+      res.send(String(heartToggle));
+    }
+}
+
+module.exports.checkLike = async(req, res)=>{
+  const userID = req.user&&req.user._id;
+  const cafeID = req.params.id;
+  if(userID === undefined){
+    res.send('0');
+  }
+  else{
+    const user = await User.findById(userID);
     const exist = user&&user.likes.some(cafe => cafe._id.equals(cafeID));
-    console.log(exist);
     if(exist){
-      await User.updateOne({_id: userID}, {$pull: {likes:cafeID}});
-      heartToggle = 0;
+      res.send('1');
     }
     else{
-      await User.updateOne({_id:userID}, {$push:{likes:cafeID}});
-      heartToggle = 1;
+      res.send('0');
     }
-    const user2 = await User.findById(userID); 
-    console.log("Like Result ", user2);
-
-  res.send(String(heartToggle));
+  }
 }
 
 
@@ -175,6 +197,53 @@ module.exports.isValideNickname = async (req, res, next) =>{
 module.exports.deleteId = async(req, res)=>{
   const userID = req.user&&req.user._id;
   await User.findOneAndDelete(userID)
+
+  const cafes = await Cafe.find({author:userID});
+  const commentCafe = await Cafe.find({"comment.user":userID});
+
+  for (const cafe of cafes) {
+    if (cafe.images) {
+      for (const img of cafe.images) {
+        if (img.filename) {
+          await cloudinary.uploader.destroy(img.filename);
+        }
+      }
+    }
+  
+    if (cafe.comment) {
+      for (const com of cafe.comment) {
+        if (com.filename) {
+          await cloudinary.uploader.destroy(com.filename);
+        }
+      }
+    }
+  
+    for (const m of cafe.menu) {
+      if (m.filename) {
+        await cloudinary.uploader.destroy(m.filename);
+      }
+    }
+  
+    for (const rePre of cafe.repreMenu) {
+      if (rePre.filename) {
+        await cloudinary.uploader.destroy(rePre.filename);
+      }
+    }
+  }
+  
+  for (const cafe of commentCafe) {
+    if (cafe.comment) {
+      for (const com of cafe.comment) {
+        if (com.user.toString() === userID.toString()) {
+          if (com.filename) {
+            await cloudinary.uploader.destroy(com.filename);
+          }
+        }
+      }
+    }
+  }
+  
+
   await Cafe.deleteMany({author:userID});
   await Cafe.updateMany(
     {"comment.user":userID},

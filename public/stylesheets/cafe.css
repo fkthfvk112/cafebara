@@ -144,7 +144,6 @@
 
 .cardWrapper{
   display: inline-block;
-  min-width:13em;
-  max-width:20em;
+  width:18em;
   margin:1em;
 }

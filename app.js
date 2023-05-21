@@ -85,9 +85,6 @@ app.use('/cafe', cafeRoutes)
 app.use('/user', userRoutes)
 
 
-app.get('/home', (req, res)=>{
-    res.render('home')
-});
 
 app.get('/map', (req, res)=>{
   res.render('map');
@@ -122,6 +119,11 @@ app.delete('/cafe', async(req, res)=>{
 app.get('/cafe/:id', (req, res)=>{
   res.sendFile('/public/client-react/build/index.html', {root:'.'})
 })
+
+
+app.get('/', (req, res)=>{
+  res.render('home')
+});
 
 app.get('/temp', (req, res)=>{
   res.render('temp');

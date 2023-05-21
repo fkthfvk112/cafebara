@@ -37,4 +37,7 @@ router.route('/deleteId')
 router.route('/like/:id')
     .get(users.likeCafe)
 
+router.route('/checkLike/:id')
+    .get(users.checkLike)
+    
 module.exports = router;

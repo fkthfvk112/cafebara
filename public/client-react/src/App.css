@@ -100,3 +100,15 @@
   top: '0.8em';
   padding:0.5em 1.5em 0.5em 1.5em;
 }
+
+.hearMessageOn{
+  position:absolute;
+  display: block;
+  color:white;
+
+  z-index:'2';
+  padding:0.5em 0.2em 0.5em 0.2em;
+  border-radius: 10px;
+  border:1px solid white;
+  background-color: #cfbaf0;
+}

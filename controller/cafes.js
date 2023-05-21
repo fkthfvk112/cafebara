@@ -177,10 +177,10 @@ module.exports.createReview = async(req, res) => {
   };
 
 
-  const destroyImages = (parentOfImages) =>{
+  const destroyImages = async(parentOfImages) =>{
     if(parentOfImages){
       for(let element of parentOfImages){
-        if(element.filename) cloudinary.uploader.destroy(element.filename)
+        if(element.filename)await cloudinary.uploader.destroy(element.filename)
       }
     }
   }
