@@ -12,6 +12,8 @@ const path = require('path');
 /*DataBase*/
 const Cafe = require('./models/cafe');
 const User = require('./models/user');
+const dbUrl = process.env.DBURL;
+
 
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -27,9 +29,12 @@ const cookieParser = require('cookie-parser');
 const cafeRoutes = require('./routes/cafe');
 const userRoutes = require('./routes/user');
 const { createProxyMiddleware } = require('http-proxy-middleware');//react cors처리
+const helmet = require('helmet');
 
+//dbUrl
+//"mongodb://127.0.0.1:27017/Cafe"
 mongoose.set('strictQuery', false);
-mongoose.connect("mongodb://127.0.0.1:27017/Cafe")
+mongoose.connect(dbUrl)
   .then(() => {
     console.log("MongoDB is connected");
   })
@@ -79,7 +84,10 @@ app.use(cookieParser('keyboard cat'));
 
 app.use(flash());
 
-
+app.use(helmet({
+    contentSecurityPolicy : false,
+    crossOriginEmbedderPolicy : false
+}));
 
 app.use('/cafe', cafeRoutes)
 app.use('/user', userRoutes)

@@ -24,19 +24,24 @@ function PageOne(probs){
     let cntStudy = 0;
     let cntTalk = 0;
     let cntElse = 0;
+    let cntTakeOut = 0;
     try{
       for(let data of probs.cafeData.comment){
         if(data.purpose == 'study') cntStudy +=1;
         if(data.purpose == 'talk') cntTalk +=1;
+        if(data.purpose == 'takeOut') cntTakeOut +=1;
         else cntElse +=1
       }
-      if(cntTalk >= cntStudy && cntTalk >= cntElse){
+      if(cntTalk >= cntStudy && cntTalk >= cntElse && cntTalk >= cntTakeOut){
         return 'talk';
         // setAtmos('talk');
       }
-      else if(cntStudy > cntTalk && cntStudy >= cntElse){
+      else if(cntStudy > cntTalk && cntStudy >= cntElse && cntStudy > cntTakeOut){
         return 'study';
         // setAtmos('study');
+      }
+      else if(cntTakeOut > cntStudy && cntTakeOut > cntTalk && cntTakeOut >= cntElse){
+        return 'takeOut'
       }
       else return '기타';
       // else setAtmos('???');
@@ -50,10 +55,10 @@ function PageOne(probs){
   useEffect(()=>{
     const fetchData = async()=>{
       try{
-        const response = await axios.get(`http://localhost:8080/cafe/api/totalRating/${probs.id}`);
+        const response = await axios.get(`https://yammycafe.fly.dev/cafe/api/totalRating/${probs.id}`);
         setRatings(response.data);
 
-        const heartToggle = await axios.get(`http://localhost:8080/user/checkLike/${probs.id}`);
+        const heartToggle = await axios.get(`https://yammycafe.fly.dev/user/checkLike/${probs.id}`);
         setHeart(heartToggle.data);
       }
       catch(e){
@@ -95,7 +100,7 @@ function PageOne(probs){
     console.log("하트 ")
         try{
           if(probs.isLoggedIn){
-            const fetchedData = await axios.get(`http://localhost:8080/user/like/${probs.id}`);
+            const fetchedData = await axios.get(`https://yammycafe.fly.dev/user/like/${probs.id}`);
             setHeart(fetchedData.data);
             console.log("하트 ", fetchedData.data)
           }
@@ -143,7 +148,7 @@ function PageOne(probs){
             </div>
           </div>
           <div style={{marginTop:'1.5rem'}}>분위기</div>
-          <div style={{backgroundColor:'#219ebc', color:'white', padding:'0 1rem 0 1rem', borderRadius:'1rem', marginTop:'0.5rem'}}>
+          <div style={{backgroundColor:'#219ebc', color:'white', padding:'0 1rem 0 1rem', borderRadius:'1rem', marginTop:'0.5rem', minWidth:'4.5em'}}>
             {handleAtmos()}
           </div>
         </div>
@@ -180,7 +185,7 @@ function PageTwoSectionOne(probs){
   useEffect(()=>{
     const fetchData = async()=>{
       try{
-        const response = await axios.get(`http://localhost:8080/cafe/api/totalRating/${id}`);
+        const response = await axios.get(`https://yammycafe.fly.dev/cafe/api/totalRating/${id}`);
         setRatings(response.data);
       }
       catch(e){
@@ -196,7 +201,7 @@ function PageTwoSectionOne(probs){
     const percentage =`${percentage_num}%`;
 
     return(
-      <div className="progress w-60 col-8" role="progressbar" aria-valuemax="5" style={{padding:'0px'}}>
+      <div className="progress w-50 col-6 offset-1" role="progressbar" aria-valuemax="5" style={{padding:'0px'}}>
       <div className="progress-bar" style={{width: percentage}}>{value}</div>
       </div>
     )
@@ -216,7 +221,7 @@ function PageTwoSectionOne(probs){
               {ratings&& <ProgressBar rate={ratings.taste?ratings.taste:0}></ProgressBar>}
           </div>
           <div className="row" style={{textAlign:'left'}}>
-            <span className="offset-1 col-3 mb-3">분위기</span>
+            <span style={{display:"inline-block", whiteSpace:'nowrap'}} className="offset-1 col-3 mb-3">분위기</span>
             {ratings&&<ProgressBar rate={ratings.atmosphere?ratings.atmosphere:0}></ProgressBar>}
           </div>
           <div className="row" style={{textAlign:'left'}}>
@@ -230,36 +235,34 @@ function PageTwoSectionOne(probs){
 }
 
 function PageTwoSectionTwo(probs){
-
   const [data, setData] = useState(null);
-  const [deleteToggle, setDeleteToggle] = useState(false);
+  const [deleteCnt, setDeleteCnt] = useState(0);
   const url = window.location.pathname;
   const id = url.substring(url.lastIndexOf('/') + 1);
   useEffect(() => {
-    if(deleteToggle === true) setDeleteToggle(false);
     const fetchData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/cafe/api/${id}`);
+        const response = await axios.get(`https://yammycafe.fly.dev/cafe/api/${id}`);
         setData(response.data);
       } catch (error) {
         console.log(error);
       }
     };
     fetchData();
-  }, [probs.parentData, deleteToggle]); //data수정. 컴포넌트 재 랜더링 되도록
+  }, [deleteCnt, probs.isCommentUpdated]);
 
   const connectedUserId = probs.user.user ? probs.user.user._id : null;
   
   async function submitForm(data) {
     const url = window.location.pathname;
     const id = url.substring(url.lastIndexOf('/') + 1);
-    await axios.delete(`http://localhost:8080/cafe/user/review/${id}`,{
+    await axios.delete(`https://yammycafe.fly.dev/cafe/user/review/${id}`,{
       data:{
         commentID: data
       } 
     })
       .then((res) => {
-        setDeleteToggle(true);
+        setDeleteCnt(deleteCnt+1);
       })
       .catch((err) => {
         console.log(err);
@@ -280,7 +283,7 @@ function PageTwoSectionTwo(probs){
       const rating = comment.rating;
       const ratingAvg = ((rating.price + rating.taste + rating.atmosphere)/3).toFixed(2);
       const img = comment.image && <img
-                  className="d-block w-100"
+                  className="d-block"
                   src={comment.image}
                   style ={{objectFit :'contain', width :'100%', height :'100%'}}
                   />
@@ -291,21 +294,21 @@ function PageTwoSectionTwo(probs){
           {probs.isLoggedIn&&(comment.user._id===connectedUserId)&&<button type="submit" class="btn btn-outline-secondary btn-sm">삭제</button>}
           </form>
         </div>
-          <div className="col-3" style={{minWidth:'110px'}}>
+        <div className="col-3 d-flex justify-content-center flex-column align-items-center" style={{minWidth:'110px'}}>
           <StarRating count={5} size={15} value={ratingAvg}></StarRating>
-          <div className="ml-3 mb-2" style = {{textAlign:'left', marginLeft:'0.5rem'}}>{comment.user.nickName}</div>
-          <div style={{paddingRight:'10px', width:"100px", height:"100px"}}>
-            {img}
-          </div>
-          </div>
-          <div className="offset-lg-1 col-8 ml-3" style={{borderLeft:`2px solid ${grayColor}`}}>
-          <div style={{textAlign:'left'}}>
-            <div style={{textSize:'1em', color:'white', textAlign:'center', display:'inline-block', backgroundColor:'#219ebc', padding:'0 1rem 0 1rem', borderRadius:'1rem', marginTop:'0.5rem'}}>
-              {comment.purpose}
+            <div className="ml-3 mb-2" style = {{textAlign:'left', marginLeft:'0.5rem'}}>{comment.user.nickName}</div>
+              <div style={{maxWidth:"100px", maxHeight:"100px", textAlign:"center"}}>
+                {img}
+              </div>
             </div>
-          </div>
-            <div className='text-start'>{comment.content}</div>
-          </div>
+          <div className="offset-lg-1 col-8 ml-3" style={{borderLeft:`2px solid ${grayColor}`}}>
+            <div style={{textAlign:'left'}}>
+              <div style={{textSize:'1em', color:'white', textAlign:'center', display:'inline-block', backgroundColor:'#219ebc', padding:'0 1rem 0 1rem', borderRadius:'1rem', marginTop:'0.5rem'}}>
+              {comment.purpose}
+              </div>
+            </div>
+          <div className='text-start'>{comment.content}</div>
+        </div>
     </Container>
     );
   }}
@@ -325,6 +328,7 @@ function PageTwoSectionThree(probs) {
   const [priceRate, setPriceRate] = useState(5);
   const [study, setStudy] = useState(false);
   const [talk, setTalk] = useState(false);
+  const [takeOut, setTakeOut] = useState(false);
   const [noFeature, setNoFeature] = useState(false);
   const [imgFile, setImgFile] = useState({});
 
@@ -348,11 +352,12 @@ function PageTwoSectionThree(probs) {
     const id = url.substring(url.lastIndexOf('/') + 1);
 
     console.log('데이터', data);
-    await axios.post(`http://localhost:8080/cafe/user/review/${id}`, data)
+    await axios.post(`https://yammycafe.fly.dev/cafe/user/review/${id}`, data)
       .then((res) => {
         setFormState('');
         console.log(data);
         console.log(res);
+        probs.setCommentUpdated({...{state:true}});
       })
       .catch((err) => {
         console.log(err);
@@ -360,8 +365,6 @@ function PageTwoSectionThree(probs) {
   }
   const handleSubmit = (event) => {
     event.preventDefault();
-    probs.setCommentUpdated({...{state:true}});
-
     const formData = new FormData();
 
     formData.append('comment', formState);
@@ -371,6 +374,7 @@ function PageTwoSectionThree(probs) {
     formData.append('priceRate', priceRate);
     formData.append('study', study);
     formData.append('talk', talk);
+    formData.append('takeOut', takeOut);
     formData.append('noFeature', noFeature);
     formData.append('photos', imgFile);
 
@@ -380,7 +384,9 @@ function PageTwoSectionThree(probs) {
   };
 
   const handleInputChange = (event) => {
-    setFormState(event.target.value);
+    let commentLength = event.target.value;
+    if(commentLength.length <= 135)
+      setFormState(event.target.value);
   };
 
   const handleButtonClick = () => {
@@ -395,26 +401,33 @@ function PageTwoSectionThree(probs) {
     setStudy(true);
     setTalk(false);
     setNoFeature(false);
+    setTakeOut(false);
   }
 
   const handelTalk = (evt) =>{
     setTalk(true);
     setNoFeature(false);
     setStudy(false);
+    setTakeOut(false);
   }
 
+  const handelTakeOut = (evt) =>{
+    setTakeOut(true);
+    setTalk(false);
+    setNoFeature(false);
+    setStudy(false);
+  }
   const handelNoFeature = (evt) =>{
     setNoFeature(true);
     setStudy(false);
     setTalk(false);
+    setTakeOut(false);
   }
   
   const handleFileUpload = (event) =>{
     const uploadedFile = event.target.files[0];
     setImgFile(uploadedFile);
-    console.log("업로드딘 파일", uploadedFile);
   }
-
 
   return (
     <div className="mb-3">
@@ -429,17 +442,17 @@ function PageTwoSectionThree(probs) {
               </div>
               <form onSubmit={handleSubmit} className="d-flex flex-column" enctype="multipart/form-data">
                       <div className="modal-body d-flex flex-column mt-3">
-                          <div className='offset-1 col-8 mb-3' style={{textAlign:'right'}}>
+                          <div className='offset-1 col-8 mb-3' style={{textAlign:'center'}}>
                             <div>
-                              <span>맛 : </span>
+                              <div>맛</div>
                               <input type='range' min="1" max="5" step="1" style={{width:'12rem'}} value={tasteRate} onChange={hanldeTasteRate}></input>
                             </div>
                             <div>
-                              <span>분위기 : </span>
+                              <div>분위기</div>
                               <input type='range' min="1" max="5" step="1" style={{width:'12rem'}} value={atmosRate} onChange={hanldeAtmosRate}></input>
                             </div>
                             <div>
-                              <span>가격 : </span>
+                              <div>가격</div>
                               <input type='range' min="1" max="5" step="1" style={{width:'12rem'}} value={priceRate} onChange={hanldePriceRate}></input>
                             </div>
                         </div>
@@ -455,6 +468,12 @@ function PageTwoSectionThree(probs) {
                             <input className="form-check-input" type="radio" name="flexRadioDefault" value={talk} onChange={handelTalk} />
                             <label className="form-check-label" for="exampleRadios2">
                               수다
+                            </label>
+                          </div>
+                          <div className="form-check  form-check-inline">
+                            <input className="form-check-input" type="radio" name="flexRadioDefault" value={takeOut} onChange={handelTakeOut} />
+                            <label className="form-check-label" for="exampleRadios2">
+                              테이크아웃
                             </label>
                           </div>
                           <div className="form-check  form-check-inline">
@@ -491,7 +510,7 @@ function PageTwo(probs){
   return(
     <div>
       <PageTwoSectionOne isCommentUpdated = {isCommentUpdated} />
-      <PageTwoSectionTwo setCommentUpdated = {setCommentUpdated} parentData  = {lastComment} isLoggedIn = {probs.isLoggedIn} user = {probs.user}/>
+      <PageTwoSectionTwo isCommentUpdated={isCommentUpdated} setCommentUpdated = {setCommentUpdated} parentData  = {lastComment} isLoggedIn = {probs.isLoggedIn} user = {probs.user}/>
       {probs.isLoggedIn?<PageTwoSectionThree setCommentUpdated = {setCommentUpdated} setParentData = {setData} user = {probs.user}/>:<div></div>}
     </div>
   )
@@ -506,7 +525,7 @@ function PageThree(props){
       <div className='row border-bottom mb-3'>
         <div className="col-4">
           <div className="mb-3" style={{fontWeight:'bold', textAlign:'start'}}>{repre.name}</div>
-          <div style={{textAlign:'start', marginLeft:'0.5rem'}}>{repre.price.toLocaleString()}원</div>
+          <div style={{textAlign:'start', marginLeft:'0.2em'}}>{repre.price.toLocaleString()}원</div>
         </div>
         <div className='col-5'>
           <div style={{textAlign:'start'}}>
@@ -535,7 +554,7 @@ function PageThree(props){
       <div className='row border-bottom mb-3 p-3'>
         <div className="col-4">
           <div className="mb-3" style={{fontWeight:'bold', textAlign:'start'}}>{menu.name}</div>
-          <div style={{textAlign:'start', marginLeft:'0.5rem'}}>{menu.price.toLocaleString()}원</div>
+          <div style={{textAlign:'start', marginLeft:'0.2em'}}>{menu.price.toLocaleString()}원</div>
         </div>
         <div className='col-5'>
           <div style={{textAlign:'start'}}>
@@ -552,8 +571,8 @@ function PageThree(props){
   function RepreMenu(){
     if(repreMenuArr){
       return(
-        <div style={{border:'3px ridge #5e548e', padding:'2rem', margin:'1rem', borderRadius:'15px'}}>
-          <h3 style={{marginBottom:'3rem', color:'#000814'}}>***대표 메뉴***</h3>
+        <div style={{border:'3px ridge #edede9', padding:'1em', marginBottom:'1em', borderRadius:'15px'}}>
+          <h3 style={{marginBottom:'1.5em',  color:'#000814'}}>***대표 메뉴***</h3>
           {repreMenuArr}
         </div>
       )
@@ -569,7 +588,7 @@ function PageThree(props){
     if(menuArr){
       return(
         <div>
-          <h4 style={{textAlign:'start', paddingLeft:'15px', padding:'15px', marginLeft:'15px',  marginRight:'15px', marginBottom:'15px',border:`1px ${grayColor} solid;`, backgroundColor:'#dfe7fd'}}>
+          <h4 style={{textAlign:'start', paddingLeft:'15px', padding:'15px', marginLeft:'0.3em',  marginRight:'0.3em', marginBottom:'15px',border:`1px ${grayColor} solid;`, backgroundColor:'#edede9'}}>
             메뉴
           </h4>
           {menuArr}
@@ -582,7 +601,7 @@ function PageThree(props){
   }
 
   return(
-    <div style={{ maxWidth: '650px', minWidth:'300px' }}>
+    <div style={{ maxWidth: '650px',  width:'100%',minWidth:'8em' }}>
       <RepreMenu/>
       <Menu/>
     </div>
@@ -599,8 +618,8 @@ function SetPage(probs) {
   const id = url.substring(url.lastIndexOf('/') + 1);
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const response = await axios.get(`http://localhost:8080/cafe/api/${id}`);
+      try {//https://yammycafe.fly.dev/
+        const response = await axios.get(`https://yammycafe.fly.dev/cafe/api/${id}`);
         setCafeData(response.data);
         setMenus(response.data.menu);
         setRepreMenus(response.data.repreMenu);
@@ -631,15 +650,15 @@ function SetPage(probs) {
   const handlEditeButton = async() => {
     const url = window .location .pathname ;
     const id = url .substring (url .lastIndexOf ('/') + 1 );
-    window.location.href = `http://localhost:8080/cafe/edit/${id}`;
+    window.location.href = `https://yammycafe.fly.dev/cafe/edit/${id}`;
   }
 
   const handleDeleteButton = async ()=>{
     const url = window .location .pathname ;
     const id = url .substring (url .lastIndexOf ('/') + 1 );
-    await axios.delete(`http://localhost:8080/cafe/${id}`)
+    await axios.delete(`https://yammycafe.fly.dev/cafe/${id}`)
       .then((res)=>{
-        window.location.replace("http://localhost:8080/cafe");
+        window.location.replace("https://yammycafe.fly.dev/cafe");
       })
       .catch((err)=>{
         console.log("Error : ", err);
@@ -657,7 +676,7 @@ function SetPage(probs) {
 
   
   return (
-    <div>
+  <div>
       <button className='topButton btn1' onClick={() => setPage(0)}>
         요약
       </button>
@@ -667,11 +686,11 @@ function SetPage(probs) {
       <button className='topButton btn3' onClick={() => setPage(2)}>
         메뉴
       </button>
-      <div className='d-flex justify-content-center container row'>
+      <div className="d-flex flex-column justify-content-center align-items-center" style={{margin:'0'}}>
         {content}
         {editButton}
         {deleteButton}
-        <details style={{marginBottom:'5em'}}>
+        <details style={{textAlign:'center', marginBottom:'5em', minWidth:'20em', width:'100%'}}>
           <summary>지도 보기</summary>
           <KakaoMap latitude={cafeData&&cafeData.latitude} longitude={cafeData&&cafeData.longitude}></KakaoMap>
         </details>
@@ -684,19 +703,29 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState({});
   useEffect(() => {
-    axios.get('http://localhost:8080/user/api/islogIn')
+    axios.get(`https://yammycafe.fly.dev/user/api/islogIn`)
       .then((res) => {
         const data = res.data;
         setIsLoggedIn(!!(data.isLoggedIn));
         setUserData(data);
       });
   }, []);
+
+  let containerColor;
+  let backImg;
+  if (window.location.pathname === '/') {
+    backImg = '/media/coffeeBean.jpg'
+  } else {
+    containerColor = 'white';
+    backImg = '/media/coffeeBean.jpg'
+  }
+
   console.log('유저 데이터', userData)
   return (
-    <div className="App">
+    <div className="App" style={{backgroundColor:'white', backgroundImage:`url(${backImg})`, paddingBottom:'7em'}}>
       <NavBar isLoggedIn={isLoggedIn}></NavBar>
-      <Container className="d-flex justify-content-center mb-3" style={{backgroundColor:'white', border:`1px solid ${grayColor}`, marginTop:'10%', minWidth:'350px'}}>
-        <Router className="d-flex justify-content-center"> 
+      <Container className="allPageContainer d-flex justify-content-center mb-3">
+        <Router className="wrapper3D d-flex justify-content-center">
           <Routes>
             <Route path="/cafe/:id" element={<SetPage isLoggedIn={isLoggedIn} user={userData} />} />
             <Route path="/" element={<Home/>} />

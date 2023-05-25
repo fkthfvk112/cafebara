@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
+const KAKAOMAP_KEY = process.env.REACT_APP_KAKAOMAP_KEY;
 
 export function KakaoMap(probs) {
 
     useEffect(()=>{
         const script = document.createElement('script');
         script.async = true;
-        script.src= '//dapi.kakao.com/v2/maps/sdk.js?appkey=36ae5291fff272f636c29f53ee0e5ad5&libraries=services,clusterer&autoload=false';
+        script.src= `//dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAOMAP_KEY}&libraries=services,clusterer&autoload=false`;
         document.head.appendChild(script);
             script.addEventListener("load", ()=>{
                 if(probs.latitude != null && probs.longitude != null)

@@ -141,6 +141,9 @@ module.exports.createReview = async(req, res) => {
     else if(req.body.talk === 'true'){
       atmos = 'talk';
     }
+    else if(req.body.takeOut === 'true'){
+      atmos = 'takeOut';
+    }
     else{
       atmos = 'nofeatures'
     }  
@@ -385,9 +388,13 @@ module.exports.filteredCafe = async(req, res)=>{
     $or:[
       {name:{ $regex : searchTerm, $options:'i'}},
       {"menu.name":{ $regex : searchTerm, $options:'i'}},
-      {"repreMenu.name":{ $regex : searchTerm, $options:'i'}}
+      {"repreMenu.name":{ $regex : searchTerm, $options:'i'}},
+      {location:{$regex : searchTerm, $options:'i'}}
     ]
-  }).sort({score:{$meta : 'textScore'}}).select({ score: { $meta: 'textScore' } })
+  })
+  sortByRatingDec(cafes);
+  
+  //.sort({score:{$meta : 'textScore'}}).select({ score: { $meta: 'textScore' } })
 
   cafes.forEach((cafe)=>{
     const ratingAVGtotal = cafe.ratingAVGtotal;

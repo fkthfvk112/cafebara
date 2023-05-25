@@ -188,7 +188,11 @@ cafeSchema.virtual('reviewCnt').get(function(){
   return reviewCnt;
 })
 
-
+cafeSchema.index({
+  name: 'text',
+  // 'menu.name': 'text',
+  // 'repreMenu.name': 'text'
+});
 module.exports = mongoose.model('Cafe', cafeSchema);//모델에 접근
 
 

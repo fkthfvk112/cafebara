@@ -1,5 +1,7 @@
 .App {
   text-align: center;
+  width:100%;
+  overflow-x: hidden;
 }
 
 .App-logo {
@@ -13,16 +15,6 @@
   }
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
 
 .App-link {
   color: #61dafb;
@@ -36,13 +28,22 @@
     transform: rotate(360deg);
   }
 }
-
+.allPageContainer{
+  background-color:white;
+  border-radius: 20px;
+  border:1px solid #edede9;
+  padding-bottom:3em;
+  margin-top:10%;
+  display:inline-block;
+  max-width:55em;
+  min-width:18em;
+}
 .topButton{
   width: 20vw;
   height: 30px;
   max-width: 250px;
   min-width: 100px;
-  background-color: #231942;
+  background-color: #5e503f;
   color: azure;
   border:none;
   padding: 5px 8% 5px 8%;
@@ -51,13 +52,13 @@
   z-index: 1;
   transition: 0.2s ease;
   border-radius: 10px 10px 0px 0px;
-  font-size: 62%;
   font-weight: bold;
+  white-space: nowrap;
 
 }
 
 .topButton:hover{
-  background-color: #5e548e;
+  background-color: #c6ac8f;
 }
 
 .red{
