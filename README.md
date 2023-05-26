@@ -3,12 +3,20 @@
 </hr>
 <h2>기술 스택</h2>
 <ul>
-  <li>Node.js express</li>
-  <li>MongoDB</li>
-  <li>React</li>
+  <li>Node.js - js런타임 환경</li>
+  <li>express - js기반 서버 프레임워크</li>
+  <li>MongoDB - NoSQL 데이터베이스</li>
+  <li>React - 클라이언트 사이드 프레임워크</li>
+  <li>Bootstrap, Bootstrap-react - CSS 프레임워크</li>
 </ul>
 <h2>사용 API</h2>
 <ul>
   <li>cloudinary - 사진 저장 및 관련 api 제공 Sass 클라우드</li>
   <li>Kakaomap API - 카카오 지도, 마커 생성, 위치 기반 검색 등의 기능 제공</li>
+  <li> kakao 공유 API - 카카오 공유 기능 제공</li>
 </ul>
+<h2>배포</h2>
+<ul>
+  <li>fly.io - 도커이미지 기반 어플리케이션 배포 플랫폼</li>
+  <li>mongoDB Atlas - 몽고DB 클라우드 서비스 </li>
+ </ul>
