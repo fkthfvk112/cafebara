@@ -1,6 +1,9 @@
 <h1>카페바라</h1>
+![cafebara](https://github.com/fkthfvk112/cafebara/assets/76651990/9c6cdaea-2652-42f6-9677-894e3820faa3)
+
 <h2>프로젝트 설명</h2>
 <ul>
+  
   <li>카페 항목을 모아보는 서비스를 제공하는 Node.js 기반 개인 프로젝트</li>
   <li>몽고DB의 regex를 사용한 검색 기능을 제공한다. 몽고DB의 검색 값을 자바스크립트로 처리한 필터링 결과를 제공한다.</li>
   <li>passport local 기반 로그인 및 회원가입을 제공한다.</li>
