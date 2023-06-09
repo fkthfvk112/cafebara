@@ -1,5 +1,5 @@
 <h1>카페바라</h1>
-![cafebara](https://github.com/fkthfvk112/cafebara/assets/76651990/9c6cdaea-2652-42f6-9677-894e3820faa3)
+<src href="https://github.com/fkthfvk112/cafebara/assets/76651990/9c6cdaea-2652-42f6-9677-894e3820faa3"></src>
 
 <h2>프로젝트 설명</h2>
 <ul>
